@@ -7,6 +7,7 @@ TODO:
  * (wouldn't be actually better if addons would be mixed with standard commands in online manual?')
  * support general tabs (requires adding a class to the pre code tabs)
  * support GUI tab which would be a general div (switch of pre?)
+ * numbers in python code (is_python_number fucntion/regexp)
 
 */
 
@@ -502,8 +503,8 @@ $(document).ready(function() {
 
     $("p").each(function() {
         // putting module to em as a link
-        // here the groups before and after might not be necessary
-        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.]+[a-zA-Z])(['"`\s\.,]|$)/g, '$1<em><a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a></em>$3')); 
+        // here the groups before and after should avoid some strange combinations
+        $(this).html($(this).html().replace(/(^|[^a-zA-Z_])([a-z]3?\.[a-zA-Z.]+[a-zA-Z])([^a-zA-Z_]|$)/g, '$1<em><a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a></em>$3')); 
     });
 
     // this is toc, not code
