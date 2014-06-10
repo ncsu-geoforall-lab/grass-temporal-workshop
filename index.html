@@ -1,206 +1,439 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title></title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+
+  <script src="jquery.js"></script>
+
+<!--
+<link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/default.min.css">
+<script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+-->
+
+<link rel="stylesheet" href="highlightjs/styles/default.css">
+<script src="highlightjs/highlight.pack.js"></script>
+
+
+<style>
+.hljs{
+    display: none;
+    /*padding: 0em;*/
+}
+
+</style>
+
+
+  <link rel="stylesheet" href="grassdocs.css">
+  <link rel="stylesheet" href="codetabs.css">
+  
+</head>
+
+<body>
+
+
+<h2>Topic:Management and visualization of multitemporal data in GRASS 7</h2>
+<p>
+Anna Petrasova </p>
+<ul>
+<li> analyze coastal terrain time series
+<li> analyze climate data
+<li> compute and visualize solar radiation dynamics
+</ul>
+
+Data and software: 
+<ul>
+<li>LOCATION <a href="../media/02/nc_climate_spm_2000_2012.zip">NC climate</a>
+<li>alternative color tables: <a href="temperature_color.txt">temperature</a>,
+    <a href="precip_color.txt">precipitation</a>
+<li><a href="nagshead_series.txt">nagshead_series.txt: list of Nags Head raster maps</a> 
+and <a href="nagshead_series_int.txt">nagshead_series_int.txt: list of Nags Head interpolated raster maps</a> 
+to be used for temporal data set registration
+<li>install matplotlib.pyplot if you don't have it already
+</ul>
+
+
+
+<h2>NagsHead series</h2>
+
+
+Start grass7 with LOCATION north_carolina_spm and MAPSET NaghHead_series.
+Get it from the <a href="a_stc.html">previous assignment</a> if you don't have it.
+To run this through GUI just type the relevant command in command console and hit enter.
+Save interesting images for your report throughout the assignment.
+
+Create space-time raster dataset.
+
+<pre id="creation-of-dataset">
+<code class="neutral">
+t.create output=NagsHead_99_08 type=strds temporaltype=relative title="Nags Head elevation series" description="from 1999 to 2008 with gaps"
+</code>
+<code class="python generate"></code>
+</pre>
+
+Check whether it was successfull.
+
 <pre>
-<font color="#000066">
-############# NagsHead series ###############
-
-# start grass7 with LOCATION north_carolina_spm and MAPSET NaghHead_series
-# get it from the <a href="a_stc.html">previous assignment</a> if you don't have it
-# to run this through GUI just type the relevant command in command console and hit enter
-# save interesting images for your report throughout the assignment
-
-#
-# create space-time raster dataset </font>
-t.create output=NagsHead_99_08 type=strds temporaltype=relative \
-title="Nags Head elevation series" description="from 1999 to 2008 with gaps"
-<font color="#000066">
-# check whether it was successfull </font>
+<code>
 t.list type=strds
-<font color="#000066">
-# register maps in the dataset using the list of maps in the file nagshead_series.txt </font>
+</code>
+</pre>
+
+Register maps in the dataset using the list of maps in the file nagshead_series.txt.
+
+<pre>
+<code>
 t.register input=NagsHead_99_08 type=rast file=nagshead_series.txt unit=years
-<font color="#000066">
-# to run it from GUI: in command console type t.register  and hit enter
-# do not forget to set unit to year, there is no overwrite button
-# then you can enter the list of maps followed by relative date interactively
-# into the dialog window </font>
+</code>
+</pre>
+
+To run it from GUI: in command console type t.register  and hit enter.
+Do not forget to set unit to year, there is no overwrite button.
+Then you can enter the list of maps followed by relative date interactively.
+Into the dialog window.
+
+<pre>
+<samp>
 NH_1999_1m|1999
 NH_2001_1m|2001
 NH_2004_1m|2004
 NH_2005_1m|2005
 NH_2007_1m|2007
 NH_2008_1m|2008
-<font color="#000066">
-# check again, pay special attention to 'Relative time' section
-# and number of registered maps under 'Metadata information' </font>
+</samp>
+</pre>
+
+Check again, pay special attention to 'Relative time' section.
+And number of registered maps under 'Metadata information'.
+
+<pre>
+<code>
 t.info -h NagsHead_99_08
-<font color="#000066">
-# to see detailed time info about each maps run a list or temporal graph output </font>
+</code>
+</pre>
+
+To see detailed time info about each maps run a list or temporal graph output.
+
+<pre>
+<code>
 t.rast.list NagsHead_99_08
 g.gui.timeline NagsHead_99_08
-<font color="#000066">
-# interpolation: t.rast.gapfill not working for point-in-time data
-# use r.series.interp instead  </font>
+</code>
+</pre>
+
+Interpolation: t.rast.gapfill not working for point-in-time data.
+Use r.series.interp instead .
+
+<pre>
+<code>
 g.region rast=NH_1999_1m -p
-r.series.interp inp=NH_1999_1m,NH_2001_1m,NH_2004_1m,NH_2005_1m,NH_2007_1m,NH_2008_1m \
-datapos=1999,2001,2004,2005,2007,2008 \
-output=NH_2000_1m_interp_double,NH_2002_1m_interp_double,NH_2003_1m_interp_double,NH_2006_1m_interp_double \
-sampl=2000,2002,2003,2006
-<font color="#000066">
-# created maps are of type DCELL, we need to have the same type (FCELL) for voxel </font>
+r.series.interp inp=NH_1999_1m,NH_2001_1m,NH_2004_1m,NH_2005_1m,NH_2007_1m,NH_2008_1m datapos=1999,2001,2004,2005,2007,2008 output=NH_2000_1m_interp_double,NH_2002_1m_interp_double,NH_2003_1m_interp_double,NH_2006_1m_interp_double sampl=2000,2002,2003,2006
+</code>
+</pre>
+
+Created maps are of type DCELL, we need to have the same type (FCELL) for voxel.
+
+<pre>
+<code>
 r.mapcalc "NH_2000_1m_interp = float(NH_2000_1m_interp_double)" --o
 r.mapcalc "NH_2002_1m_interp = float(NH_2002_1m_interp_double)" --o
 r.mapcalc "NH_2003_1m_interp = float(NH_2003_1m_interp_double)" --o
 r.mapcalc "NH_2006_1m_interp = float(NH_2006_1m_interp_double)" --o
-<font color="#000066">
-# register interpolated maps from file nagshead_series_int.txt 
-# or add the list directly in the dialog </font>
+</code>
+</pre>
+
+Register interpolated maps from file nagshead_series_int.txt .
+Or add the list directly in the dialog.
+
+<pre>
+<code>
 t.register input=NagsHead_99_08 file=nagshead_series_int.txt unit=years
+</code>
+</pre>
+<pre>
+<samp>
 NH_2000_1m_interp|2000
 NH_2002_1m_interp|2002
 NH_2003_1m_interp|2003
 NH_2006_1m_interp|2006
-<font color="#000066">
-# check what you have now in the temporal database
-# set the same color table for all maps </font>
+</samp>
+</pre>
+
+Check what you have now in the temporal database.
+Set the same color table for all maps.
+
+<pre>
+<code>
 t.rast.list -h NagsHead_99_08
 t.rast.colors input=NagsHead_99_08 raster=NH_1999_1m
-<font color="#000066">
-# display animation of space-time raster data set
-# File > Animation tool</font>
+</code>
+</pre>
+
+Display animation of space-time raster data set.
+File > Animation tool.
+
+<pre>
+<code>
 g.gui.animation strds=NagsHead_99_08
-<font color="#000066">
-# display animation in 3D: launch wxGUI, add e.g. NH_1999_1m, go to 3D view,
-# set view and resolution, save workspace file,
-# you can save your settings as m.nviz.image command using the button on GIS Layer manager (second row)
-# in animation tool edit animation, choose 3d mode, set workspace file, leave there elevation_map
-##?? I got black box for 3D animation on 10.6, try it on Mac 10.8
-# example of a saved command</font>
-m.nviz.image elevation_map=NH_1999_1m -a mode=fine resolution_fine=1 color_map=NH_1999_1m \
-position=0.94,0.87 height=789 perspective=15 twist=0 zexag=2.000000 focus=487,469,8 
-light_position=0.68,-0.68,0.80 light_brightness=80 light_ambient=20 light_color=255:255:255 \
-output=nviz_output format=ppm size=718,699
-<font color="#000066">
-# create voxel model
-##?? I was still getting complaints about different type (FCELL and DCELL)</font>
+</code>
+</pre>
+
+Display animation in 3D: launch wxGUI, add e.g. NH_1999_1m, go to 3D view,
+set view and resolution, save workspace file,
+you can save your settings as m.nviz.image command using the button on GIS Layer manager (second row).
+In animation tool edit animation, choose 3d mode, set workspace file, leave there elevation_map.
+#?? I got black box for 3D animation on 10.6, try it on Mac 10.8.
+Example of a saved command.
+
+<pre>
+<code>
+m.nviz.image elevation_map=NH_1999_1m -a mode=fine resolution_fine=1 color_map=NH_1999_1m position=0.94,0.87 height=789 perspective=15 twist=0 zexag=2.000000 focus=487,469,8light_position=0.68,-0.68,0.80 light_brightness=80 light_ambient=20 light_color=255:255:255 output=nviz_output format=ppm size=718,699
+</code>
+</pre>
+
+Create voxel model.
+#?? I was still getting complaints about different type (FCELL and DCELL).
+
+<pre>
+<code>
 t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08_vol
 r3.info -g map=NH_1999_1m_vol
 g.region rast3d=NagsHead_99_08_vol -p3
-<font color="#000066">
-# create dummy voxel model for coloring </font>
-r3.mapcalc "color_vol = color_vol = if (depth()==1, 1999, if(depth()==2, 2000,if(depth()==3,2001,if(depth()==4,2002,if(dep
-th()==5,2003,if(depth()==6,2004,if(depth()==7,2005,if(depth()==8,2006,if(depth()==9,2007,2008)))))))))"
-<font color="#000066">
-# display in 3D, consider dividing elevation by 10 because we have to use big exaggeration for the voxel
+</code>
+</pre>
 
-############### Climate data analysis ################
-# start grass7 with LOCATION nc_climate_spm and MAPSET climate2000_2012
-# to run this through GUI just type the relevant command in command console and hit enter
-#
-# create temporal datasets </font>
-t.create output=tempmean type=strds temporaltype=absolute title="Average temperature" \
- description="Monthly temperature average in NC [C]"
-t.create output=precip type=strds temporaltype=absolute title="Preciptation" \
- description="Monthly precipitation in NC [mm]"
-<font color="#000066">
-# register raster maps into datasets
-# list raster maps with g.mlist and than copy and paste output to 'maps' parameter
-# or use backticks to pass the maps directly to t.register (Linux and Mac only) </font>
+Create dummy voxel model for coloring.
+
+<pre>
+<code>
+r3.mapcalc "color_vol = color_vol = if (depth()==1, 1999, if(depth()==2, 2000,if(depth()==3,2001,if(depth()==4,2002,if(depth()==5,2003,if(depth()==6,2004,if(depth()==7,2005,if(depth()==8,2006,if(depth()==9,2007,2008)))))))))"
+</code>
+</pre>
+
+Display in 3D, consider dividing elevation by 10 because we have to use big exaggeration for the voxel.
+
+
+
+<h2>Climate data analysis</h2>
+
+Start grass7 with LOCATION nc_climate_spm and MAPSET climate2000_2012.
+To run this through GUI just type the relevant command in command console and hit enter.
+Create temporal datasets.
+
+<pre>
+<code>
+t.create output=tempmean type=strds temporaltype=absolute title="Average temperature" description="Monthly temperature average in NC [C]"
+t.create output=precip type=strds temporaltype=absolute title="Preciptation" description="Monthly precipitation in NC [mm]"
+</code>
+</pre>
+
+Register raster maps into datasets.
+List raster maps with g.mlist and than copy and paste output to 'maps' parameter.
+Or use backticks to pass the maps directly to t.register (Linux and Mac only).
+
+<pre>
+<code class="bash">
 g.mlist type=rast pattern=*tempmean* separator=, --quiet
 t.register -i input=tempmean type=rast start=2000-01-01 increment="1 months" \
-          maps=`g.mlist type=rast pattern=*tempmean* separator=, --quiet`
+    maps=`g.mlist type=rast pattern=*tempmean* separator=, --quiet`
 g.mlist type=rast pattern=*precip* separator=, --quiet
 t.register -i input=precip type=rast start=2000-01-01 increment="1 months" \
-          maps=`g.mlist type=rast pattern=*precip* separator=, --quiet`
-<font color="#000066">
-# get some info </font>
+    maps=`g.mlist type=rast pattern=*precip* separator=, --quiet`
+</code>
+</pre>
+
+Get some info.
+
+<pre>
+<code>
 t.rast.list input=tempmean
-<font color="#000066">
-# more possibilities how to list maps </font>
+</code>
+</pre>
+
+More possibilities how to list maps.
+
+<pre>
+<code>
 t.rast.list input=tempmean columns=name,start_time,end_time method=gran granule="1 years"
-<font color="#000066">
-# univariate statistics (use where to limit output) </font>
+</code>
+</pre>
+
+Univariate statistics (use where to limit output).
+
+<pre>
+<code>
 t.rast.univar tempmean where="start_time > '2010-01-01'" -h
-<font color="#000066">
-# aggregate time series by seasons </font>
-t.rast.aggregate input=tempmean output=tempmean_seasonal base=tempmean_seasonal \
-granularity="3 months" method=average where="start_time >= '2000-03-01' and start_time < '2012-11-01'"       
-<font color="#000066">
-# extract summer periods and convert to degrees Fahrenheit
-# strftime('%m', start_time) returns the month of the map start timestamp (not a grass function but sqlite) </font>
-t.rast.extract input=tempmean_seasonal \
-where="strftime('%m', start_time)='06'" expression="(tempmean_seasonal  * 9.0/5.0) + 32" \
-output=tempmean_F_summer base=tempmean_F_summer nprocs=4
-<font color="#000066">
-# show plot of min and max values
-# first run t.rast.list and copy output to a file (you should set working directory from menu beforehand) </font>
+</code>
+</pre>
+
+Aggregate time series by seasons.
+
+<pre>
+<code>
+t.rast.aggregate input=tempmean output=tempmean_seasonal base=tempmean_seasonal granularity="3 months" method=average where="start_time >= '2000-03-01' and start_time < '2012-11-01'"       
+</code>
+</pre>
+
+Extract summer periods and convert to degrees Fahrenheit.
+Strftime('%m', start_time) returns the month of the map start timestamp (not a grass function but sqlite).
+
+<pre>
+<code>
+t.rast.extract input=tempmean_seasonal where="strftime('%m', start_time)='06'" expression="(tempmean_seasonal  * 9.0/5.0) + 32" output=tempmean_F_summer base=tempmean_F_summer nprocs=4
+</code>
+</pre>
+
+Show plot of min and max values.
+First run t.rast.list and copy output to a file (you should set working directory from menu beforehand).
+
+<pre>
+<code>
 t.rast.list -h input=tempmean_F_summer columns=start_time,min,max separator=,
-<font color="#000066">
-# now go to Python shell tab in the wxGUI and type </font>
+</code>
+</pre>
+
+Now go to Python shell tab in the wxGUI and type.
+
+<pre>
+<code class="python">
 import matplotlib.pyplot as plt
 plt.plotfile("output.txt", cols=(0,1,2), delimiter=',', subplots=False)
 plt.show()
-<font color="#000066">
-# let's do the same with precipitation dataset in a different way
-# aggregate data using time intervals of tempmean_F_summer 
-# convert milimeter to inch </font>
+</code>
+</pre>
+
+Let's do the same with precipitation dataset in a different way.
+Aggregate data using time intervals of tempmean_F_summer .
+Convert milimeter to inch.
+
+<pre>
+<code>
 t.rast.aggregate.ds input=precip sample=tempmean_F_summer output=precip_summer base=precip_summer method=average
 t.rast.mapcalc inputs=precip_summer expression="precip_summer / 25.4" output=precip_inch_summer base=precip_inch_summer nprocs=4
-<font color="#000066">
-# is precipitation and temperature correlated?
-# download extension r.regression.series</font>
+</code>
+</pre>
+
+Is precipitation and temperature correlated?.
+Download extension r.regression.series.
+
+<pre>
+<code>
 g.extension extension=r.regression.series
-<font color="#000066">
-# run g.mlist and set output into the command or use backticks (no Windows)</font>
+</code>
+</pre>
+
+Run g.mlist and set output into the command or use backticks (no Windows).
+
+<pre>
+<code class="bash">
 r.regression.series xseries=`g.mlist type=rast pattern=tempmean_F_summer* separator=, --q` \
-yseries=`g.mlist type=rast pattern=precip_inch_summer* separator=, --q` output=corr method=corcoef
+    yseries=`g.mlist type=rast pattern=precip_inch_summer* separator=, --q` output=corr method=corcoef
 r.colors map=corr color=differences
-<font color="#000066">
-# display temperatures in Raleigh
-# add this line to a file point.txt or add it 'interactively' in the v.in.ascii dialog </font>
+</code>
+</pre>
+
+Display temperatures in Raleigh.
+Add this line to a file point.txt or add it 'interactively' in the v.in.ascii dialog.
+
+<pre>
+<code class="bash">
+echo "638863,225446" | v.in.ascii -t input=point.txt output=raleigh separator=","
+</code>
+<code class="gui">
+Use "interactive" input box in v.in.ascii dialog
+or add the following line with coordinates to a point.txt file:
 638863,225446
+and use the following parameters:
 v.in.ascii -t input=point.txt output=raleigh separator=","
-<font color="#000066">
-# create a vector map and space-time vector dataset with values of summer temperature in Raleigh </font>
-t.vect.observe.strds input=raleigh strds=tempmean_F_summer output=raleigh_tempmean_summer \
-vector_output=raleigh_summer column=tempmean
-<font color="#000066">
-# list temperature values </font>
+</code>
+</pre>
+
+Create a vector map and space-time vector dataset with values of summer temperature in Raleigh.
+
+<pre>
+<code>
+t.vect.observe.strds input=raleigh strds=tempmean_F_summer output=raleigh_tempmean_summer vector_output=raleigh_summer column=tempmean
+</code>
+</pre>
+
+List temperature values.
+
+<pre>
+<code>
 t.vect.db.select input=raleigh_tempmean_summer columns=tempmean separator=, where="cat = 1"
-<font color="#000066">
-# plot the values using matplotlib commands as before
-# extract one year and animate it 
-# change color table if desired (to precipitaton_monthly or create your own)</font>
+</code>
+</pre>
+
+Plot the values using matplotlib commands as before.
+Extract one year and animate it .
+Change color table if desired (to precipitaton_monthly or create your own).
+
+<pre><code>
 t.rast.extract --o input=tempmean output=tempmean_2012 base=tempmean_2012 where="start_time >= '2012-01-01'"
 t.rast.extract --o input=precip output=precip_2012 base=precip_2012 where="start_time >= '2012-01-01'"
 t.rast.colors input=precip_2012 rules=precipitation_monthly
-<font color="#000066">
-# display animation of precipitation and temperatures
-# display legend, set min, max values in legend from t.info </font>
+</code></pre>
+
+Display animation of precipitation and temperatures.
+Display legend, set min, max values in legend from t.info.
+
+<pre><code>
 g.gui.animation
-<font color="#000066">
-############# r.sun simulation ##############
-#
-# choose a location where to run irradiance analysis (Nags Head or Indian Hill should work)
-# download extension (r.sun.hourly or r.sun.daily) </font>
-g.extension r.sun.hourly
-<font color="#000066">
-# example of running r.sun.hourly
-# get the today's date from runing this command in Python shell tab in wxGUI </font>
+</code></pre>
+
+
+<h2>r.sun simulation</h2>
+
+Choose a location where to run irradiance analysis (Nags Head or Indian Hill should work).
+Download extension (r.sun.hourly or r.sun.daily).
+
+<pre><code>
+g.extension extension=r.sun.hourly
+</code></pre>
+
+Example of running r.sun.hourly.
+Get the today's date from runing this command in Python shell tab in wxGUI.
+
+<pre>
+<code class="python">
 from datetime import datetime
 datetime.now().timetuple().tm_yday
-<font color="#000066">
-# and insert it in the command
-# export e.g. beam irradiance raster series (it can take some time...) </font>
-r.sun.hourly -t elev_in=lid640ground_bspline2 start_time=6 end_time=20 day=282 year=2013 \
-beam_rad_basename=beam nprocs=4
-t.rast.colors input=beam color=grey
-<font color="#000066">
-# animate 2D </font>
-g.gui.animation strds=beam
-<font color="#000066">
-# animate 3D
-# open wxGUI, load elevation map, go to 3D view, set view and other parameters as desired
-# save workspace file
-# launch animation tool, set 3D, space-time raster dataset, 
-# set workspace file and choose color_map option </font>
+</code>
 </pre>
 
+And insert it in the command.
+Export e.g. beam irradiance raster series (it can take some time...).
+
+<pre>
+<code>
+r.sun.hourly -t elev_in=lid640ground_bspline2 start_time=6 end_time=20 day=282 year=2013 beam_rad_basename=beam nprocs=4
+t.rast.colors input=beam color=grey
+</code>
+</pre>
+
+Animate 2D.
+
+<pre>
+<code>
+g.gui.animation strds=beam
+</code>
+</pre>
+
+Animate 3D.
+Open wxGUI, load elevation map, go to 3D view, set view and other parameters as desired.
+Save workspace file.
+Launch animation tool, set 3D, space-time raster dataset, 
+set workspace file and choose color_map option.
+
+
+
+
+
+  <script src="codetabs.js"></script>
+</body>
+</html>
