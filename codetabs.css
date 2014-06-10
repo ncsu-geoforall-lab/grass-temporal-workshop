@@ -22,7 +22,7 @@
 .tabs-menu li {
     list-style-type: none;
     height: 15px;
-    /*line-height: 30px;*/
+    /*line-height: 15px;*/
     float: left;
     /*margin-right: 10px;*/
     background-color: white;
@@ -32,8 +32,9 @@
     border-bottom: 1px solid #d4d4d1;
     padding: 0px;
     margin: 0px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 0px;
+    padding-right: 0px;
+    /* here we are making space for a to have large padding */
     padding-bottom: 5px;
     padding-top: 5px;
 }
@@ -46,11 +47,15 @@
 }
 
 .tabs-menu li a {
-    padding-bottom: 0px;
-    padding-top: 0px;
+    /* a lot of padding to spread across the whole tab */
+    padding-bottom: 5px;
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
     margin: 0px;
     color: grey;
     text-decoration: none;
+    line-height: 15px;
 }
 
 .tabs-menu .current a {
