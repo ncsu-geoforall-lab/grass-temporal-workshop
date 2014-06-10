@@ -1,3 +1,13 @@
+/*
+
+TODO:
+ * support for long flags
+ * first/one parameter without option name is not supported
+ * support for links to addons
+ * (wouldn't be actually better if addons would be mixed with standard commands in online manual?')
+
+*/
+
 // name of class
 // visible in source code
 NEUTRAL_LANG = 'neutral'
@@ -13,6 +23,11 @@ GRASS_SCRIPT_PREFIX = "grass."
 
 // full name of the function to call grass command (without "(")
 //GRASS_RUN_COMMAND = GRASS_SCRIPT_PREFIX + "run_command"
+
+// link to be used to link modules
+// including the last slash
+GRASS_MANUAL_LINK='http://grass.osgeo.org/grass71/manuals/'
+
 
 if (!String.prototype.trim) {
   String.prototype.trim = function () {
@@ -308,14 +323,16 @@ $(document).ready(function() {
     });
 
     $('pre').has('code').each(function() {
-        var neutral_only = true;
-        var small_command = false;
+        var neutral_only = true;  // unused
+        var small_command = false;  // unused
+        var generate_others = true;
         $(this).children('code').each(function() {
             var code_element = $(this);
             if (!code_element.hasClass(NEUTRAL_LANG)) {
                 if (code_element.is(".python,.bash,.gui")) {
                     // do nothing
                     neutral_only = false;
+                    generate_others = false;
                 }
                 else {
                     code_element.addClass(NEUTRAL_LANG);
@@ -323,13 +340,15 @@ $(document).ready(function() {
                     //console.log(".............:" + code_element.text().search(/[^\s][\s][^\s]/g))
                     if (code_element.text().search(/[^\s][\s][^\s]/g) == -1) {
                         small_command = true;
+                        generate_others = false;
                     }
                 }
             } else {
                 // it was specified that it is neutral
+                generate_others = false;
             }
         });
-        if (neutral_only && !small_command) {
+        if (generate_others) {
             // add others to autogenerate
             $(this).append('<code class="python generate"></code>');
             $(this).append('<code class="bash generate"></code>');
@@ -473,11 +492,16 @@ $(document).ready(function() {
 
     // link modules to grass documentation
     $("pre code").each(function() {
+        // creating a link around module name
         // the groups 1 and 3 makes sure that we don't match things inside python functions
-        // this limit matching of pygrass but any python will be probably necessary to handle separately
-        $(this).html($(this).html().replace(/(^|['"`\s.])([a-z]3?\.[a-zA-Z.]+)(['"`\s.]|$)/g, '$1<a href="http://grass.osgeo.org/grass71/manuals/$2.html" class="modulelink">$2</a>$3')); 
-        //$(this).html().replace(/r.info/g, '<a href="http://grass.osgeo.org/grass71/manuals/r.info.html" class="modulelink">r.info</a>'); 
-        //console.log($(this).html().replace(/r.info/g, '<a href="http://grass.osgeo.org/grass71/manuals/r.info.html" class="modulelink">r.info</a>') + "xxx")
+        // this limit matching of pygrass but any python will be probably necessary to handle separately anyway
+        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.]+)(['"`\s\.]|$)/g, '$1<a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a>$3')); 
+    });
+
+    $("p").each(function() {
+        // putting module to em as a link
+        // here the groups before and after might not be necessary
+        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.]+)(['"`\s\.,]|$)/g, '$1<em><a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a></em>$3')); 
     });
 
     // this is toc, not code

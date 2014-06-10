@@ -177,11 +177,19 @@ h* {
     display: block;
 }
 
-a.modulelink {
+pre code a.modulelink {
     color: inherit;
     text-decoration: none;
 }
 
-a.modulelink:hover {
+pre code a.modulelink:hover {
+    text-decoration: underline;
+}
+
+p a.modulelink {
+    text-decoration: none;
+}
+
+p a.modulelink:hover {
     text-decoration: underline;
 }
