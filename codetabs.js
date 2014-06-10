@@ -5,6 +5,8 @@ TODO:
  * first/one parameter without option name is not supported
  * support for links to addons
  * (wouldn't be actually better if addons would be mixed with standard commands in online manual?')
+ * support general tabs (requires adding a class to the pre code tabs)
+ * support GUI tab which would be a general div (switch of pre?)
 
 */
 
@@ -495,13 +497,13 @@ $(document).ready(function() {
         // creating a link around module name
         // the groups 1 and 3 makes sure that we don't match things inside python functions
         // this limit matching of pygrass but any python will be probably necessary to handle separately anyway
-        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.]+)(['"`\s\.]|$)/g, '$1<a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a>$3')); 
+        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.]+[a-zA-Z])(['"`\s\.]|$)/g, '$1<a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a>$3')); 
     });
 
     $("p").each(function() {
         // putting module to em as a link
         // here the groups before and after might not be necessary
-        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.]+)(['"`\s\.,]|$)/g, '$1<em><a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a></em>$3')); 
+        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.]+[a-zA-Z])(['"`\s\.,]|$)/g, '$1<em><a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a></em>$3')); 
     });
 
     // this is toc, not code
