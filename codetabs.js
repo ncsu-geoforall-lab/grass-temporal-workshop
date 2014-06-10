@@ -302,26 +302,24 @@ $(document).ready(function() {
                 if (code_element.is(".python,.bash,.gui")) {
                     // do nothing
                     neutral_only = false;
-                    console.log("do nothing")
                 }
                 else {
                     code_element.addClass('neutral');
-                    console.log("add class")
-                    console.log(".............:" + code_element.text().search(/[^\s][\s][^\s]/g))
+                    //console.log("add class")
+                    //console.log(".............:" + code_element.text().search(/[^\s][\s][^\s]/g))
                     if (code_element.text().search(/[^\s][\s][^\s]/g) == -1) {
                         small_command = true;
                     }
                 }
             } else {
-                console.log(code_element.text())
-                console.log(code_element.hasClass('neutral'))
+                // it was specified that it is neutral
             }
         });
         if (neutral_only && !small_command) {
             // add others to autogenerate
             $(this).append('<code class="python generate"></code>');
             $(this).append('<code class="bash generate"></code>');
-            $(this).append('<code class="gui generate"></code>');
+            // $(this).append('<code class="gui generate"></code>');
         }
         element = $(this).children('code');
         element.css("display", "none");
