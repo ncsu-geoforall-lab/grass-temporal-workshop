@@ -1,4 +1,18 @@
+// name of class
+// visible in source code
 NEUTRAL_LANG = 'neutral'
+// to avoid doing this plus in other methods then hasClass
+NEUTRAL_LANG_SELECTOR = '.' + 'neutral'
+// user visible label
+NEUTRAL_LANG_LABEL = 'Standard'
+
+// including . to support also no prefix
+// for import grass.script as gscript use "gscript"
+// for from grass.script import run_command use ""
+GRASS_SCRIPT_PREFIX = "grass."
+
+// full name of the function to call grass command (without "(")
+//GRASS_RUN_COMMAND = GRASS_SCRIPT_PREFIX + "run_command"
 
 if (!String.prototype.trim) {
   String.prototype.trim = function () {
@@ -152,7 +166,7 @@ function print_python(parsed_code) {
         //console.log("YYY command.options[0].key: " + parsed_code[0].options[0].key)
         for (var i = 0; i < parsed_code.length; i++) {
             command = parsed_code[i];
-            var line = "gscript.run_command(" + preferred_quote;
+            var line = GRASS_SCRIPT_PREFIX + "run_command(" + preferred_quote;
             line += command.module + preferred_quote;
             if (command.flags)
                 line += ", flags=" + preferred_quote + command.flags + preferred_quote;
@@ -165,7 +179,7 @@ function print_python(parsed_code) {
                     // end and flush line, indent new one
                     line += ',\n';
                     new_code += line;
-                    line = new Array("gscript.run_command(".length + 1).join(' ');
+                    line = new Array((GRASS_SCRIPT_PREFIX + "run_command(").length + 1).join(' ');
                 }
                 else {
                     line += ", ";
@@ -298,13 +312,13 @@ $(document).ready(function() {
         var small_command = false;
         $(this).children('code').each(function() {
             var code_element = $(this);
-            if (!code_element.hasClass('neutral')) {
+            if (!code_element.hasClass(NEUTRAL_LANG)) {
                 if (code_element.is(".python,.bash,.gui")) {
                     // do nothing
                     neutral_only = false;
                 }
                 else {
-                    code_element.addClass('neutral');
+                    code_element.addClass(NEUTRAL_LANG);
                     //console.log("add class")
                     //console.log(".............:" + code_element.text().search(/[^\s][\s][^\s]/g))
                     if (code_element.text().search(/[^\s][\s][^\s]/g) == -1) {
@@ -362,11 +376,11 @@ $(document).ready(function() {
         }
         else if (tabcontent.hasClass(NEUTRAL_LANG)) {
             lang = NEUTRAL_LANG
-            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;">Platform neutral'
+            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;">' + NEUTRAL_LANG_LABEL
         }
         else {
             lang = NEUTRAL_LANG
-            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;">Platform neutral'
+            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;">' + NEUTRAL_LANG_LABEL
         }
         //console.log(tabcontent.parent().parent().children('ul'))
         /*closest('tabs-container')*/
@@ -395,7 +409,7 @@ $(document).ready(function() {
             //if (!tabcontent.siblings('.neutral').text()) {
                 //console.log("XXXX-----" + tabcontent.siblings('.neutral').text() + "---------XXXXX")
             //}
-            tabcontent.text(generate_code(tabcontent.siblings('.neutral').text(), lang));
+            tabcontent.text(generate_code(tabcontent.siblings(NEUTRAL_LANG_SELECTOR).text(), lang));
             //console.log(tabcontent[0]);
         } else {
             tabcontent.text(tabcontent.text().trim());
