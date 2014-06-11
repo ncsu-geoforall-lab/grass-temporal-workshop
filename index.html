@@ -59,18 +59,19 @@ Outline:
 Software:
 <ul>
 <li>GRASS GIS 7</li>
-<li>matplotlib and matplotlib.pyplot</li>
+<li>matplotlib with pyplot
+(included in GRASS installation for MS Windows; package python-matplotlib for Ubuntu)</li>
 </ul>
 
 <p>
 Data:
 <ul>
-<li>LOCATION <a href="http://courses.ncsu.edu/mea592/common/media/02/nc_climate_spm_2000_2012.zip">NC climate</a>
+<li>location <a href="http://courses.ncsu.edu/mea592/common/media/02/nc_climate_spm_2000_2012.zip">NC climate</a>
 <li>alternative color tables:
     <a href="http://courses.ncsu.edu/mea592/common/Assign_GISmdmodel/temperature_color.txt">temperature</a>,
     <a href="http://courses.ncsu.edu/mea592/common/Assign_GISmdmodel/precip_color.txt">precipitation</a>
 <li>
-location <a href="http://courses.ncsu.edu/mea592/common/gisdata/JockeysRidge.zip">NC smp with JR mapset</a>,
+location <a href="http://courses.ncsu.edu/mea592/common/gisdata/JockeysRidge.zip">NC smp</a> with JR mapset,
 mapset <a href="http://courses.ncsu.edu/mea582/common/media/01/NagsHead_series.zip">NagsHead</a> to be copied to NC smp location,
 </ul>
 
@@ -91,7 +92,7 @@ Notes:
 <h2>NagsHead series</h2>
 
 <p>
-Start grass7 with LOCATION north_carolina_spm and MAPSET NaghHead_series.
+Start grass7 with location north_carolina_spm and mapset NaghHead_series.
 
 <p>
 Create space-time raster dataset.
@@ -296,7 +297,7 @@ Display in 3D, consider dividing elevation by 10 because we have to use big exag
 <h2>Climate data analysis</h2>
 
 <p>
-Start grass7 with LOCATION nc_climate_spm and MAPSET climate2000_2012.
+Start grass7 with location nc_climate_spm and mapset climate2000_2012.
 Create temporal datasets:
 <!-- TODO: explain what is temporal dataset "think about container", the type is strds STRDS-->
 
@@ -332,11 +333,30 @@ t.register -i input=precip_sum type=rast start=2000-01-01 increment="1 months" \
 </pre>
 
 <p>
-Get some info about the newly created dataset.
+Get some info about the newly created dataset:
 
 <pre>
 <code>
 t.rast.list input=tempmean
+</code>
+</pre>
+
+<p>
+Visualize spatio-temporal extents:
+
+<pre>
+<code class="neutral">
+g.gui.timeline tempmean
+</code>
+</pre>
+
+<p>
+Create an animation of two space-time datasets:
+
+<pre>
+<code class="gui">
+Run g.gui.animation and add two animations,
+one for tempmean and the other for precip_sum dataset.
 </code>
 </pre>
 
@@ -508,7 +528,9 @@ t.rast.extract input=precip_sum output=precip_2012 base=precip_2012 where="start
 t.rast.colors input=precip_2012 rules=precipitation_monthly
 </code></pre>
 
-Display temporal extents of datasets
+<h3>Spatio-temporal visualizations</h3>
+
+Display temporal extents of datasets:
 
 <pre><code class="neutral">
 g.gui.timeline input=tempmean_2012,precip_2012
