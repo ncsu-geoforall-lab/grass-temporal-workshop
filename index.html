@@ -261,7 +261,7 @@ Here is an example of a saved command:
 <!-- TODO: implement saving as python -->
 <pre>
 <code>
-m.nviz.image elevation_map=NH_1999_1m -a mode=fine resolution_fine=1 color_map=NH_1999_1m position=0.94,0.87 height=789 perspective=15 twist=0 zexag=2.000000 focus=487,469,8light_position=0.68,-0.68,0.80 light_brightness=80 light_ambient=20 light_color=255:255:255 output=nviz_output format=ppm size=718,699
+m.nviz.image elevation_map=NH_1999_1m -a mode=fine resolution_fine=1 color_map=NH_1999_1m position=0.94,0.87 height=789 perspective=15 twist=0 zexag=2.000000 focus=487,469,8 light_position=0.68,-0.68,0.80 light_brightness=80 light_ambient=20 light_color=255:255:255 output=nviz_output format=ppm size=718,699
 </code>
 </pre>
 
@@ -271,7 +271,7 @@ Create a 3D raster.
 <pre>
 <code>
 t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08_vol
-r3.info -g map=NH_1999_1m_vol
+r3.info -g map=NagsHead_99_08_vol
 g.region rast3d=NagsHead_99_08_vol -p3
 </code>
 </pre>
@@ -598,6 +598,7 @@ Open wxGUI, load elevation map, go to 3D view, set view and other parameters as 
 Save workspace file.
 Launch animation tool, set 3D, space-time raster dataset,
 set workspace file and choose color_map option.
+Note that 3D animation are not supported on MS Windows.
 </p>
 <!-- the last tag must be closed -->
 
