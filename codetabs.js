@@ -386,11 +386,11 @@ $(document).ready(function() {
         var description = ''
         if (tabcontent.hasClass('python')) {
             lang = 'python'
-            description = '<img src="python.svg" style="height: 1em; width: 1em; margin-right: 0.2em;">Python'
+            description = '<img src="python.png" style="height: 1em; width: 1em; margin-right: 0.2em;">Python'
         }
         else if (tabcontent.hasClass('bash')) {
             lang = 'bash'
-            description = '<img src="bash2.svg" style="height: 1em; width: 1em; margin-right: 0.2em;">Bash'
+            description = '<img src="bash.png" style="height: 1em; width: 1em; margin-right: 0.2em;">Bash'
         }
         else if (tabcontent.hasClass('gui')) {
             lang = 'gui'
