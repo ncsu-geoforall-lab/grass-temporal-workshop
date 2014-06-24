@@ -78,15 +78,28 @@ mapset <a href="http://courses.ncsu.edu/mea582/common/media/01/NagsHead_series.z
 <p>
 Terminology:
 <ul>
-<li>map</li>
-<li>3D raster, voxel, voxel model, volume</li>
-<li>spatio-temporal dataset</li>
+<li>map in GRASS describes a spatial phenomena, map is stored in GRASS database,
+  it can be raster, vector, or 3D raster (other GIS systems often call this a layer)</li>
+<li>raster map usually describes a continuous spatial phenomena, examples include precipitation and aerial image</li>
+<li>vector map usually describes a discrete spatial phenomena, for example meteorological stations</li>
+<li>3D raster is a three dimensional raster, alternative names include voxel, voxel model and volume</li>
+<li>spatio-temporal dataset in GRASS is a set of GRASS maps registered in GRASS temporal database</li>
+<li>
+  GRASS module is one function, procedure or algorithm,
+  it can be also referred as command especially when also all parameters are given
+  (other systems use also terms tool and program),
+  module can be invoked from GUI, Python or system command line
+</li>
+<li>GUI is a graphical user interface, i.e. the windows which user usually sees after starting GRASS GIS
+  (GUI in GRASS GIS is often referred as wxGUI because of the underlying technology)</li>
 </ul>
 
 <p>
 Notes:
 <ul>
-<li>To run this through GUI just type the relevant command in command console and hit enter.
+<li>To run commands in GUI, fill the module
+  parameters into a proper form or just type the type the relevant command
+  into the command console in GUI and press enter.</li>
 </ul>
 
 <h2>NagsHead series</h2>
