@@ -192,24 +192,24 @@ t.info tempmean
 <p>
 <pre>
 <samp>
- +-------------------- Space Time Raster Dataset -----------------------------+
- |                                                                            |
- +-------------------- Basic information -------------------------------------+
- | Id: ........................ tempmean@climate_2000_2012
- | Name: ...................... tempmean
- | Mapset: .................... climate_2000_2012
- | Creator: ................... anna
- | Temporal type: ............. absolute
- | Creation time: ............. 2014-07-11 12:40:57.473036
- | Modification time:.......... 2014-07-11 12:41:06.799619
- | Semantic type:.............. mean
- +-------------------- Absolute time -----------------------------------------+
- | Start time:................. 2000-01-01 00:00:00
- | End time:................... 2013-01-01 00:00:00
- | Granularity:................ 1 month
- | Temporal type of maps:...... interval
- +-------------------- Spatial extent ----------------------------------------+
- | ...
++-------------------- Space Time Raster Dataset -----------------------------+
+|                                                                            |
++-------------------- Basic information -------------------------------------+
+| Id: ........................ tempmean@climate_2000_2012
+| Name: ...................... tempmean
+| Mapset: .................... climate_2000_2012
+| Creator: ................... anna
+| Temporal type: ............. absolute
+| Creation time: ............. 2014-07-11 12:40:57.473036
+| Modification time:.......... 2014-07-11 12:41:06.799619
+| Semantic type:.............. mean
++-------------------- Absolute time -----------------------------------------+
+| Start time:................. 2000-01-01 00:00:00
+| End time:................... 2013-01-01 00:00:00
+| Granularity:................ 1 month
+| Temporal type of maps:...... interval
++-------------------- Spatial extent ----------------------------------------+
+| ...
 </samp>
 </pre>
 
@@ -255,6 +255,8 @@ t.rast.list tempmean_2010
 # we can choose different columns and order
 t.rast.list input=tempmean_2010 columns=name,start_time,end_time,min,max sep="  "
 t.rast.list input=precip_sum_2010 columns=start_time,min order=min sep="  "
+# display temporal extents
+g.gui.timeline inputs=tempmean,precip_sum,tempmean_2010,precip_sum_2010
 </code>
 </pre>
 <img src="./pictures/timeline_extracted.png" alt="extracted datasets"></img>
