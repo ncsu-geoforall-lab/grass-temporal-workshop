@@ -71,7 +71,7 @@ Data:
     <a href="http://courses.ncsu.edu/mea592/common/Assign_GISmdmodel/temperature_color.txt">temperature</a>,
     <a href="http://courses.ncsu.edu/mea592/common/Assign_GISmdmodel/precip_color.txt">precipitation</a>
 <li>
-location <a href="http://courses.ncsu.edu/mea592/common/gisdata/JockeysRidge.zip">NC smp</a> with JR mapset,
+location <a href="http://courses.ncsu.edu/mea592/common/gisdata/JockeysRidge.zip">NC spm</a> with JR mapset,
 mapset <a href="http://courses.ncsu.edu/mea582/common/media/01/NagsHead_series.zip">NagsHead</a> to be copied to NC smp location,
 </ul>
 
@@ -101,6 +101,377 @@ Notes:
   parameters into a proper form or just type the type the relevant command
   into the command console in GUI and press enter.</li>
 </ul>
+
+
+<h2>Climate data analysis</h2>
+
+<h3>Basic commands and visualizations</h3>
+<p>
+Start grass7 with location nc_climate_spm and mapset climate_2000_2012.
+First we list available raster maps and display the first temperature
+and precipitation maps from the series to make ourselves familiar with the data.
+
+<pre>
+<code>
+g.mlist type=rast pattern="*tempmean"
+g.mlist type=rast pattern="*precip"
+</code>
+</pre>
+
+<pre>
+<code class="gui">
+Add raster map layer -> select 2000_01_tempmean
+Add raster map layer -> select 2000_01_precip
+</code>
+<code class="bash">
+# start monitor
+d.mon wx0
+# display raster maps
+d.rast 2000_01_tempmean
+d.rast 2000_01_precip
+</code>
+</pre>
+
+To better handle the long time series of maps, we create temporal datasets
+which serve as containers for the time series and we will further manipulate
+them instead of the individual maps. First, we create empty datasets of type
+strds (space-time raster dataset):
+<!-- TODO: explain what is temporal dataset "think about container", the type is strds STRDS-->
+
+<pre>
+<code>
+t.create output=tempmean type=strds temporaltype=absolute title="Average temperature" description="Monthly temperature average in NC [deg C]"
+t.create output=precip_sum type=strds temporaltype=absolute title="Preciptation" description="Monthly precipitation sums in NC [mm]"
+</code>
+</pre>
+
+<p>
+Now we register raster maps into yet empty space-time raster datasets
+with start date 2000-01-01 and interval time with increment 1 month. 
+We use g.mlist again (or g.list in future GRASS versions) to list them:
+
+<pre>
+<code class="gui">
+List raster maps with g.mlist:
+    g.mlist type=rast pattern="*tempmean" separator=comma --quiet
+    g.mlist type=rast pattern="*precip" separator=comma --quiet
+And than copy and paste output to maps parameter of t.register:
+    t.register -i input=tempmean type=rast start=2000-01-01 increment="1 months" maps=...
+    t.register -i input=precip_sum type=rast start=2000-01-01 increment="1 months" maps=...
+</code>
+<code class="bash">
+# first list maps to check the pattern and output
+g.mlist type=rast pattern="*tempmean" separator=comma --quiet
+g.mlist type=rast pattern="*precip" separator=comma --quiet
+
+# then use backticks to pass the maps directly to t.register
+t.register -i input=tempmean type=rast start=2000-01-01 increment="1 months" \
+    maps=`g.mlist type=rast pattern="*tempmean" separator=comma --quiet`
+t.register -i input=precip_sum type=rast start=2000-01-01 increment="1 months" \
+    maps=`g.mlist type=rast pattern="*precip" separator=comma --quiet`
+</code>
+</pre>
+
+<p>
+Make sure the datasets are created and populated correctly:
+<pre>
+<code>
+t.list type=strds
+t.rast.list input=tempmean sep=tab
+</code>
+</pre>
+
+<p>
+Get some info about the newly created dataset:
+<pre>
+<code>
+t.info tempmean
+</code>
+</pre>
+
+<p>
+<pre>
+<samp>
+ +-------------------- Space Time Raster Dataset -----------------------------+
+ |                                                                            |
+ +-------------------- Basic information -------------------------------------+
+ | Id: ........................ tempmean@climate_2000_2012
+ | Name: ...................... tempmean
+ | Mapset: .................... climate_2000_2012
+ | Creator: ................... anna
+ | Temporal type: ............. absolute
+ | Creation time: ............. 2014-07-11 12:40:57.473036
+ | Modification time:.......... 2014-07-11 12:41:06.799619
+ | Semantic type:.............. mean
+ +-------------------- Absolute time -----------------------------------------+
+ | Start time:................. 2000-01-01 00:00:00
+ | End time:................... 2013-01-01 00:00:00
+ | Granularity:................ 1 month
+ | Temporal type of maps:...... interval
+ +-------------------- Spatial extent ----------------------------------------+
+ | ...
+</samp>
+</pre>
+
+
+<p>
+Visualize spatio-temporal extents:
+
+<pre>
+<code class="neutral">
+g.gui.timeline tempmean
+</code>
+</pre>
+<img src="./pictures/timeline_tempmean.png" alt="plot of temporal extents of tempmean strds",
+title="Plot of temporal extents of space-time raster dataset tempmean"></img>
+
+<!--
+comment this out if necessary
+-->
+<p>
+Query space-time raster dataset in a point and display the values in a plot
+(available only in the newest GRASS GIS 7 version).
+<pre>
+<code>
+g.gui.tplot inputs=precip_sum coordinates=366165,218084
+</code>
+</pre>
+<img src="./pictures/tplot_precip_sum.png" alt="plot of values from certain coordinate"></img>
+
+<p>
+Now we will extract one year from both space-time raster datasets.
+In this case, no new maps are created, the newly created dataset just points to the old maps.
+<pre>
+<code>
+t.rast.extract input=tempmean output=tempmean_2010 where="start_time &gt;= '2010-01-01' and start_time &lt; '2011-01-01'"
+t.rast.extract input=precip_sum output=precip_sum_2010 where="start_time &gt;= '2010-01-01' and start_time &lt; '2011-01-01'"
+</code>
+</pre>
+We list the maps in the newly created dataset.
+<pre>
+<code>
+# simple listing
+t.rast.list tempmean_2010
+# we can choose different columns and order
+t.rast.list input=tempmean_2010 columns=name,start_time,end_time,min,max sep="  "
+t.rast.list input=precip_sum_2010 columns=start_time,min order=min sep="  "
+</code>
+</pre>
+<img src="./pictures/timeline_extracted.png" alt="extracted datasets"></img>
+
+<p>
+Create a synchronized animation of two space-time datasets.
+Run g.gui.animation and <a href="./pictures/anim1.png">add two animations</a>,
+one for <code>tempmean_2010</code> and the other for <code>precip_sum_2010</code> dataset.
+<p>
+<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool"></img>
+
+<p>
+Now we remove these two extracted spatio-temporal datasets. Note: in this case we remove the just the "container",
+not the actual maps.
+<pre>
+<code>
+t.remove inputs=tempmean_2010,precip_sum_2010
+t.list
+</code>
+</pre>
+<pre>
+<samp>
+Space time raster datasets with absolute time available in mapset <climate_2000_2012>:
+precip_sum@climate_2000_2012
+tempmean@climate_2000_2012
+</samp>
+</pre>
+
+
+
+<h3>Time series analysis</h3>
+
+<p>
+Another possibility how to list maps:
+
+<pre>
+<code>
+t.rast.list input=tempmean columns=name,start_time,end_time method=gran granule="1 years"
+</code>
+</pre>
+
+<p>
+Univariate statistics using t.rast.univar with (temporal) where option to limit output:
+
+<pre>
+<code>
+t.rast.univar tempmean where="start_time &gt; '2010-01-01'"
+</code>
+</pre>
+
+<p>
+Aggregate time series by seasons.
+
+<pre>
+<code>
+t.rast.aggregate input=tempmean output=tempmean_seasonal base=tempmean_seasonal granularity="3 months" method=average where="start_time &gt;= '2000-03-01' and start_time &lt; '2012-11-01'"
+</code>
+</pre>
+
+<p>
+Extract summer periods and convert to degrees Fahrenheit.
+SQLite function <tt>strftime('%m', start_time)</tt> returns the month of
+the map start timestamp.
+Note that <tt>strftime</tt> function is not a GRASS function.
+It is specific to SQLite (temporal database) backend,
+you need to use something different if you are using PostgreSQL backend.
+Using nprocs=4 we are telling t.rast.extract to use 4 processes which will be
+distributed to 4 processor cores if available.
+
+<pre>
+<code>
+t.rast.extract input=tempmean_seasonal where="strftime('%m', start_time)='06'" expression="(tempmean_seasonal  * 9.0/5.0) + 32" output=tempmean_F_summer base=tempmean_F_summer nprocs=4
+</code>
+</pre>
+
+<p>
+Show plot of min and max values.
+We will create a file with those values.
+First, set working directory from menu in GUI or by <tt>cd</tt> command,
+otherwise you will have to use full path instead of just a file name.
+
+<pre>
+<code class="bash">
+# you must be in the same directory as you switched GUI to
+# or you must use full path
+t.rast.list -h input=tempmean_F_summer columns=start_time,min,max separator=comma > temperatures.txt
+</code>
+<code class="gui">
+Run t.rast.list and copy output to a file named temperatures.txt
+t.rast.list -h input=tempmean_F_summer columns=start_time,min,max separator=comma
+</code>
+</pre>
+
+<p>
+Now go to Python shell tab in the wxGUI and type:
+
+<pre>
+<code class="python">
+import matplotlib.pyplot as plt
+plt.plotfile("temperatures.txt", cols=(0,1,2), delimiter=',', subplots=False)
+plt.show()
+</code>
+</pre>
+
+<p>
+Let's do the same with precipitation dataset in a different way.
+Aggregate data using time intervals of tempmean_F_summer.
+Convert millimeters to inches.
+
+<pre>
+<code>
+t.rast.aggregate.ds input=precip_sum sample=tempmean_F_summer output=precip_summer base=precip_summer method=average
+t.rast.mapcalc inputs=precip_summer expression="precip_summer / 25.4" output=precip_inch_summer base=precip_inch_summer nprocs=4
+</code>
+</pre>
+
+<p>
+Is precipitation and temperature correlated?
+First, download extension r.regression.series extension from GRASS Addons.
+
+<pre>
+<code>
+g.extension extension=r.regression.series
+</code>
+</pre>
+
+<p>
+Determine the correlation.
+
+<pre>
+<code class="gui">
+Run g.mlist two times with type=rast and separator=comma
+and pattern set to tempmean_F_summer* and precip_inch_summer*
+and then use the outputs as xseries and yseries parameters of
+the r.regression.series module.
+    r.regression.series xseries=... yseries=... output=corr method=corcoef
+Set color table of corr raster map to differences color table.
+    r.colors map=corr color=differences
+</code>
+<code class="bash">
+# using backticks syntax for two g.mlist runs
+r.regression.series \
+    xseries=`g.mlist type=rast pattern="tempmean_F_summer*" separator=comma --q` \
+    yseries=`g.mlist type=rast pattern="precip_inch_summer*" separator=comma --q` \
+    output=corr method=corcoef
+r.colors map=corr color=differences
+</code>
+</pre>
+
+<p>
+Now we can explore the map corr.
+
+<p>
+Display temperatures in Raleigh.
+
+<pre>
+<code class="bash">
+echo "638863,225446" | v.in.ascii -t input=- output=raleigh separator=comma
+</code>
+<code class="gui">
+Use interactive input box in v.in.ascii dialog
+or add the following line with coordinates to a point.txt file:
+638863,225446
+and use the following parameters:
+v.in.ascii -t input=point.txt output=raleigh separator=comma
+</code>
+</pre>
+
+<p>
+Create a vector map and space-time vector dataset with values of summer temperature in Raleigh.
+
+<pre>
+<code>
+t.vect.observe.strds input=raleigh strds=tempmean_F_summer output=raleigh_tempmean_summer vector_output=raleigh_summer column=tempmean
+</code>
+</pre>
+
+<p>
+List temperature values.
+
+<pre>
+<code>
+t.vect.db.select input=raleigh_tempmean_summer columns=tempmean separator=comma where="cat = 1"
+</code>
+</pre>
+
+<p>
+Plot the values using matplotlib commands as before.
+Extract one year and animate it.
+Change color table if desired (to precipitaton_monthly or create your own).
+
+<pre><code>
+t.rast.extract input=tempmean output=tempmean_2012 base=tempmean_2012 where="start_time >= '2012-01-01'"
+t.rast.extract input=precip_sum output=precip_2012 base=precip_2012 where="start_time >= '2012-01-01'"
+t.rast.colors input=precip_2012 rules=precipitation_monthly
+</code></pre>
+
+<h3>Spatio-temporal visualizations</h3>
+
+Display temporal extents of datasets:
+
+<pre><code class="neutral">
+g.gui.timeline input=tempmean_2012,precip_2012
+</code></pre>
+
+<p>
+Display animation of precipitation and temperatures.
+Display legend and set min and max values in legend using the information from t.info.
+
+<pre><code class="neutral">
+t.info input=tempmean_2012
+g.gui.animation strds=tempmean_2012
+
+t.info input=precip_2012
+g.gui.animation strds=precip_2012
+</code></pre>
+
 
 <h2>NagsHead series</h2>
 
@@ -305,261 +676,6 @@ r3.mapcalc "color_vol = color_vol = if (depth()==1, 1999, if(depth()==2, 2000, i
 
 <p>
 Display in 3D, consider dividing elevation by 10 because we have to use big exaggeration for the 3D raster.
-
-
-<h2>Climate data analysis</h2>
-
-<p>
-Start grass7 with location nc_climate_spm and mapset climate2000_2012.
-Create temporal datasets:
-<!-- TODO: explain what is temporal dataset "think about container", the type is strds STRDS-->
-
-<pre>
-<code>
-t.create output=tempmean type=strds temporaltype=absolute title="Average temperature" description="Monthly temperature average in NC [deg C]"
-t.create output=precip_sum type=strds temporaltype=absolute title="Preciptation" description="Monthly precipitation sums in NC [mm]"
-</code>
-</pre>
-
-<p>
-Register these raster maps into yet empty space-time raster datasets
-and use g.mlist (or g.list in future GRASS versions) to list them:
-
-<pre>
-<code class="gui">
-List raster maps with g.mlist:
-    g.mlist type=rast pattern="*tempmean*" separator=comma
-And than copy and paste output to maps parameter of t.register:
-    t.register -i input=tempmean type=rast start=2000-01-01 increment="1 months" maps=...
-</code>
-<code class="bash">
-# first list maps to check the pattern and output
-g.mlist type=rast pattern="*tempmean*" separator=comma --quiet
-g.mlist type=rast pattern="*precip*" separator=comma --quiet
-
-# then use backticks to pass the maps directly to t.register
-t.register -i input=tempmean type=rast start=2000-01-01 increment="1 months" \
-    maps=`g.mlist type=rast pattern="*tempmean*" separator=comma --quiet`
-t.register -i input=precip_sum type=rast start=2000-01-01 increment="1 months" \
-    maps=`g.mlist type=rast pattern="*precip*" separator=comma --quiet`
-</code>
-</pre>
-
-<p>
-Get some info about the newly created dataset:
-
-<pre>
-<code>
-t.rast.list input=tempmean
-</code>
-</pre>
-
-<p>
-Visualize spatio-temporal extents:
-
-<pre>
-<code class="neutral">
-g.gui.timeline tempmean
-</code>
-</pre>
-
-<p>
-Create an animation of two space-time datasets:
-
-<pre>
-<code class="gui">
-Run g.gui.animation and add two animations,
-one for tempmean and the other for precip_sum dataset.
-</code>
-</pre>
-
-
-<h3>Time series analysis</h3>
-
-<p>
-Another possibility how to list maps:
-
-<pre>
-<code>
-t.rast.list input=tempmean columns=name,start_time,end_time method=gran granule="1 years"
-</code>
-</pre>
-
-<p>
-Univariate statistics using t.rast.univar with (temporal) where option to limit output:
-
-<pre>
-<code>
-t.rast.univar tempmean where="start_time &gt; '2010-01-01'"
-</code>
-</pre>
-
-<p>
-Aggregate time series by seasons.
-
-<pre>
-<code>
-t.rast.aggregate input=tempmean output=tempmean_seasonal base=tempmean_seasonal granularity="3 months" method=average where="start_time &gt;= '2000-03-01' and start_time &lt; '2012-11-01'"
-</code>
-</pre>
-
-<p>
-Extract summer periods and convert to degrees Fahrenheit.
-SQLite function <tt>strftime('%m', start_time)</tt> returns the month of
-the map start timestamp.
-Note that <tt>strftime</tt> function is not a GRASS function.
-It is specific to SQLite (temporal database) backend,
-you need to use something different if you are using PostgreSQL backend.
-Using nprocs=4 we are telling t.rast.extract to use 4 processes which will be
-distributed to 4 processor cores if available.
-
-<pre>
-<code>
-t.rast.extract input=tempmean_seasonal where="strftime('%m', start_time)='06'" expression="(tempmean_seasonal  * 9.0/5.0) + 32" output=tempmean_F_summer base=tempmean_F_summer nprocs=4
-</code>
-</pre>
-
-<p>
-Show plot of min and max values.
-We will create a file with those values.
-First, set working directory from menu in GUI or by <tt>cd</tt> command,
-otherwise you will have to use full path instead of just a file name.
-
-<pre>
-<code class="bash">
-# you must be in the same directory as you switched GUI to
-# or you must use full path
-t.rast.list -h input=tempmean_F_summer columns=start_time,min,max separator=comma > temperatures.txt
-</code>
-<code class="gui">
-Run t.rast.list and copy output to a file named temperatures.txt
-t.rast.list -h input=tempmean_F_summer columns=start_time,min,max separator=comma
-</code>
-</pre>
-
-<p>
-Now go to Python shell tab in the wxGUI and type:
-
-<pre>
-<code class="python">
-import matplotlib.pyplot as plt
-plt.plotfile("temperatures.txt", cols=(0,1,2), delimiter=',', subplots=False)
-plt.show()
-</code>
-</pre>
-
-<p>
-Let's do the same with precipitation dataset in a different way.
-Aggregate data using time intervals of tempmean_F_summer.
-Convert millimeters to inches.
-
-<pre>
-<code>
-t.rast.aggregate.ds input=precip_sum sample=tempmean_F_summer output=precip_summer base=precip_summer method=average
-t.rast.mapcalc inputs=precip_summer expression="precip_summer / 25.4" output=precip_inch_summer base=precip_inch_summer nprocs=4
-</code>
-</pre>
-
-<p>
-Is precipitation and temperature correlated?
-First, download extension r.regression.series extension from GRASS Addons.
-
-<pre>
-<code>
-g.extension extension=r.regression.series
-</code>
-</pre>
-
-<p>
-Determine the correlation.
-
-<pre>
-<code class="gui">
-Run g.mlist two times with type=rast and separator=comma
-and pattern set to tempmean_F_summer* and precip_inch_summer*
-and then use the outputs as xseries and yseries parameters of
-the r.regression.series module.
-    r.regression.series xseries=... yseries=... output=corr method=corcoef
-Set color table of corr raster map to differences color table.
-    r.colors map=corr color=differences
-</code>
-<code class="bash">
-# using backticks syntax for two g.mlist runs
-r.regression.series \
-    xseries=`g.mlist type=rast pattern="tempmean_F_summer*" separator=comma --q` \
-    yseries=`g.mlist type=rast pattern="precip_inch_summer*" separator=comma --q` \
-    output=corr method=corcoef
-r.colors map=corr color=differences
-</code>
-</pre>
-
-<p>
-Now we can explore the map corr.
-
-<p>
-Display temperatures in Raleigh.
-
-<pre>
-<code class="bash">
-echo "638863,225446" | v.in.ascii -t input=- output=raleigh separator=comma
-</code>
-<code class="gui">
-Use interactive input box in v.in.ascii dialog
-or add the following line with coordinates to a point.txt file:
-638863,225446
-and use the following parameters:
-v.in.ascii -t input=point.txt output=raleigh separator=comma
-</code>
-</pre>
-
-<p>
-Create a vector map and space-time vector dataset with values of summer temperature in Raleigh.
-
-<pre>
-<code>
-t.vect.observe.strds input=raleigh strds=tempmean_F_summer output=raleigh_tempmean_summer vector_output=raleigh_summer column=tempmean
-</code>
-</pre>
-
-<p>
-List temperature values.
-
-<pre>
-<code>
-t.vect.db.select input=raleigh_tempmean_summer columns=tempmean separator=comma where="cat = 1"
-</code>
-</pre>
-
-<p>
-Plot the values using matplotlib commands as before.
-Extract one year and animate it.
-Change color table if desired (to precipitaton_monthly or create your own).
-
-<pre><code>
-t.rast.extract input=tempmean output=tempmean_2012 base=tempmean_2012 where="start_time >= '2012-01-01'"
-t.rast.extract input=precip_sum output=precip_2012 base=precip_2012 where="start_time >= '2012-01-01'"
-t.rast.colors input=precip_2012 rules=precipitation_monthly
-</code></pre>
-
-<h3>Spatio-temporal visualizations</h3>
-
-Display temporal extents of datasets:
-
-<pre><code class="neutral">
-g.gui.timeline input=tempmean_2012,precip_2012
-</code></pre>
-
-<p>
-Display animation of precipitation and temperatures.
-Display legend and set min and max values in legend using the information from t.info.
-
-<pre><code class="neutral">
-t.info input=tempmean_2012
-g.gui.animation strds=tempmean_2012
-
-t.info input=precip_2012
-g.gui.animation strds=precip_2012
-</code></pre>
 
 <h2>r.sun simulation</h2>
 
