@@ -732,57 +732,72 @@ r3.mapcalc "color_vol = color_vol = if (depth()==1, 1999, if(depth()==2, 2000, i
 <p>
 Display in 3D, consider dividing elevation by 10 because we have to use big exaggeration for the 3D raster.
 
-<h2>r.sun simulation</h2>
+
+<h2>Visualization of solar radiation</h2>
 
 <!-- TODO: here we have addons but they are linked,
 moreover we have no way to say don't link -->
 <p>
-Choose a location where to run irradiance analysis
-(Nags Head or Indian Hill should work).
-Download extension (r.sun.hourly or r.sun.daily).
+We will compute solar radiation during a day for a part of North Carolina State University Centennial Campus.
+Then we will visualize the change of solar radiation as a 3D animation.
+If you don't have r.sun.hourly, download it:
 
 <pre><code>
 g.extension extension=r.sun.hourly
 </code></pre>
 
 <p>
-Example of running r.sun.hourly.
-Get the today's date from runing this command in Python shell tab in wxGUI.
+Convert the today's date (or any other date) to day of year by running this command in Python shell tab in GUI.
 
 <pre>
 <code class="python">
 from datetime import datetime
 datetime.now().timetuple().tm_yday
+# or for an arbitrary day:
+datetime.datetime(2014, 6, 21).timetuple().tm_yday
 </code>
 </pre>
 
 <p>
-And insert it in the command.
-Export e.g. beam irradiance raster series (it can take some time).
+Use this number for option <code>day</code>.
+Export beam irradiance raster series (be patient).
 
 <pre>
 <code>
-r.sun.hourly -t elev_in=lid640ground_bspline2 start_time=6 end_time=20 day=282 year=2013 beam_rad_basename=beam nprocs=4
-t.rast.colors input=beam color=grey
+r.sun.hourly -t elev_in=elev_lid_small start_time=6 end_time=20 day=200 year=2014 beam_rad_basename=beam nprocs=4
 </code>
 </pre>
-
-<p>
-Animate 2D.
-
+Set custom color table:
 <pre>
-<code class="neutral">
-g.gui.animation strds=beam
+<code class="bash">
+echo "0% 60:60:60
+      70% yellow
+      100% 255:70:0" > rules.txt
+t.rast.colors input=beam rules=rules.txt
+</code>
+<code class="gui">
+Use interactive input box in t.rast.colors dialog
+or add the following line with coordinates to a newly created rules.txt file:
+0% 60:60:60
+70% yellow
+100% 255:70:0
+
+t.rast.colors input=beam rules=rules.txt
 </code>
 </pre>
 
 <p>
-Animate 3D.
-Open wxGUI, load elevation map, go to 3D view, set view and other parameters as desired.
-Save workspace file.
-Launch animation tool, set 3D, space-time raster dataset,
-set workspace file and choose color_map option.
+Finally, we animate the series in 3D. To do that, we first add <code>elev_lid_small</code> map in GUI,
+zoom to it, and swith to 3D view.
+We set desired view and resolution and then change the color by draping
+over one of the solar radiation maps (see <a href="http://grass.osgeo.org/grass70/manuals/wxGUI.nviz.html#3d-view-layer-manager-toolbox">GUI manual</a>).
+We save workspace to a file.
+Then we launch animation tool and add new animation. Choose 3D, add the computed space-time raster dataset,
+set saved workspace file and choose color_map option to animate.
 Note that 3D animation are not supported on MS Windows.
+<p>
+<img src="./pictures/anim3_result.png" alt="solar radiation animation in 3D"></img>
+
 </p>
 <!-- the last tag must be closed -->
 
