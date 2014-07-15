@@ -135,7 +135,7 @@ d.rast 2000_01_precip
 To better handle the long time series of maps, we create temporal datasets
 which serve as containers for the time series and we will further manipulate
 them instead of the individual maps. First, we create empty datasets of type
-strds (space-time raster dataset):
+strds (space-time raster dataset). Note, that we use absolute time.
 <!-- TODO: explain what is temporal dataset "think about container", the type is strds STRDS-->
 
 <pre>
@@ -531,10 +531,10 @@ g.gui.animation tempmean_F_summer
 <h2>NagsHead series</h2>
 
 <p>
-Start grass7 with location north_carolina_spm and mapset NaghHead_series.
+Start grass7 with location north_carolina_spm and mapset NaghHead_series. TODO revise names of location
 
 <p>
-Create space-time raster dataset.
+First, we create an empty space-time raster dataset. We will use relative time with years as units.
 
 <pre>
 <code>
@@ -543,8 +543,7 @@ t.create output=NagsHead_99_08 type=strds temporaltype=relative title="Nags Head
 </pre>
 
 <p>
-Check whether it was successfull.
-
+Check whether it was successfull:
 <pre>
 <code>
 t.list type=strds
@@ -557,38 +556,27 @@ Each map has an associated year. The default separator is a pipe.
 
 <pre>
 <code class="gui">
-In command console type t.register and hit enter.
-Do not forget to set unit to year.
-(There is no overwrite button, so it is harder to change created dataset.)
-Then you can enter the list of maps followed by relative date (year in our case).
-In dialog window, use an interactive input box for the file option and
-copy and paste the list of the maps. See the other options bellow.
+In t.register dialog, use an interactive input box for the file option and
+copy and paste the list of the maps:
+NH_1999_1m|1999
+NH_2001_1m|2001
+NH_2004_1m|2004
+NH_2005_1m|2005
+NH_2007_1m|2007
+NH_2008_1m|2008
+
+Also, use the other options bellow:
 t.register input=NagsHead_99_08 type=rast unit=years
 </code>
 <code class="bash">
-# use standard input and &lt;&lt;EOF to input list of maps and years
-t.register input=NagsHead_99_08 type=rast file=- unit=years &lt;&lt;EOF
-NH_1999_1m|1999
-NH_2001_1m|2001
-NH_2004_1m|2004
-NH_2005_1m|2005
-NH_2007_1m|2007
-NH_2008_1m|2008
-EOF
+echo "NH_1999_1m|1999
+      NH_2001_1m|2001
+      NH_2004_1m|2004
+      NH_2005_1m|2005
+      NH_2007_1m|2007
+      NH_2008_1m|2008" > NH.txt
+t.register input=NagsHead_99_08 type=rast file=NH.txt unit=years
 </code>
-</pre>
-
-<p>
-List of the maps to register in NagsHead_99_08 dataset:
-<pre>
-<samp>
-NH_1999_1m|1999
-NH_2001_1m|2001
-NH_2004_1m|2004
-NH_2005_1m|2005
-NH_2007_1m|2007
-NH_2008_1m|2008
-</samp>
 </pre>
 
 <p>
@@ -598,46 +586,28 @@ and a number of registered maps under 'Metadata information'.
 <pre>
 <code>
 t.info -h input=NagsHead_99_08
-</code>
-</pre>
-
-<p>
-To see detailed time info about each maps create a list or temporal graph output.
-
-<pre>
-<code class="neutral">
 t.rast.list NagsHead_99_08
 g.gui.timeline NagsHead_99_08
 </code>
 </pre>
+<img src="./pictures/timeline_nagshead_gaps.png" alt="temporal extents of NagsHead dataset"></img>
+
 
 <p>
-Now we will interpolate missing data.
-t.rast.gapfill does not work for point-in-time data,
-so we will use r.series.interp instead.
+Since there are gaps in the dataset, we need to interpolate missing data.
+The interpolated maps are already in the mapset so you can skip this step.
+The maps were linearly interpolated with r.series.interp. For interval data,
+you could use t.rast.gapfill.
 
 <pre>
 <code>
 g.region rast=NH_1999_1m -p
-r.series.interp input=NH_1999_1m,NH_2001_1m,NH_2004_1m,NH_2005_1m,NH_2007_1m,NH_2008_1m datapos=1999,2001,2004,2005,2007,2008 output=NH_2000_1m_interp_double,NH_2002_1m_interp_double,NH_2003_1m_interp_double,NH_2006_1m_interp_double sampl=2000,2002,2003,2006
+r.series.interp input=NH_1999_1m,NH_2001_1m,NH_2004_1m,NH_2005_1m,NH_2007_1m,NH_2008_1m datapos=1999,2001,2004,2005,2007,2008 output=NH_2000_1m_interp,NH_2002_1m_interp,NH_2003_1m_interp,NH_2006_1m_interp sampl=2000,2002,2003,2006
 </code>
 </pre>
 
 <p>
-Created maps are of type DCELL, we need to have all the maps with the same type
-(FCELL) for creation of 3D raster.
-
-<pre>
-<code>
-r.mapcalc "NH_2000_1m_interp = float(NH_2000_1m_interp_double)"
-r.mapcalc "NH_2002_1m_interp = float(NH_2002_1m_interp_double)"
-r.mapcalc "NH_2003_1m_interp = float(NH_2003_1m_interp_double)"
-r.mapcalc "NH_2006_1m_interp = float(NH_2006_1m_interp_double)"
-</code>
-</pre>
-
-<p>
-Register interpolated maps to the existing dataset.
+Now we register interpolated maps to the existing dataset.
 
 <pre>
 <code class="gui">
@@ -651,12 +621,12 @@ NH_2003_1m_interp|2003
 NH_2006_1m_interp|2006
 </code>
 <code class="bash">
-t.register input=NagsHead_99_08 file=- unit=years &lt;&lt;EOF
-NH_2000_1m_interp|2000
-NH_2002_1m_interp|2002
-NH_2003_1m_interp|2003
-NH_2006_1m_interp|2006
-EOF
+echo "NH_2000_1m_interp|2000
+      NH_2002_1m_interp|2002
+      NH_2003_1m_interp|2003
+      NH_2006_1m_interp|2006" > interp.txt
+
+t.register input=NagsHead_99_08 file=interp.txt unit=years
 </code>
 </pre>
 
@@ -668,11 +638,12 @@ Set the same color table for all maps.
 <code>
 t.rast.list -h NagsHead_99_08
 t.rast.colors input=NagsHead_99_08 raster=NH_1999_1m
+g.gui.timeline NagsHead_99_08
 </code>
 </pre>
 
 <p>
-Display animation of space-time raster data set.
+Display 2D animation of space-time raster data set.
 
 <pre>
 <code class="neutral">
@@ -760,14 +731,15 @@ datetime.datetime(2014, 6, 21).timetuple().tm_yday
 
 <p>
 Use this number for option <code>day</code>.
-Export beam irradiance raster series (be patient).
+Compute beam irradiance raster series (be patient) with the following command.
+The time series is automatically registered into a space-time raster dataset.
 
 <pre>
 <code>
 r.sun.hourly -t elev_in=elev_lid_small start_time=6 end_time=20 day=200 year=2014 beam_rad_basename=beam nprocs=4
 </code>
 </pre>
-Set custom color table:
+Set custom color table for just created dataset <code>beam</code>:
 <pre>
 <code class="bash">
 echo "0% 60:60:60
