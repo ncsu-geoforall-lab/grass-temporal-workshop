@@ -654,7 +654,12 @@ In main menu use File > Animation tool.
 </code>
 </pre>
 
-
+<!--
+maps = grass.read_command('t.rast.list', input='NagsHead_99_08', method='comma').strip().split(',')
+for map in maps:
+    name, mapset = map.split('@')
+    grass.run_command('r.contour', flags='t', input=name, output=name + '_contour', step=2, cut=50)
+-->
 <p>
 We can also display 2D and 3D animation side by side. To display animation in 3D,
 we first have to prepare and store 3D view parameters. To do that, launch GUI if not already launched,
