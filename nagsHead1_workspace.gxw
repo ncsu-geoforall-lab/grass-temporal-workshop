@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxw SYSTEM "grass-gxw.dtd">
+<gxw>
+    <layer_manager dim="83,24,525,712">
+    </layer_manager>
+    <display name="Display 1" render="1" mode="0" showCompExtent="1" alignExtent="1" constrainRes="0" dim="564,24,785,680" extent="913257.756372,249729.264146,914454.822677,250666.098646,0.000000,1.000000" tbres="1.000000" viewMode="3d" >
+        <layer type="raster" name="NHcut_1998_1m@NagsHead_series" checked="0" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>NHcut_1998_1m@NagsHead_series</value>
+                </parameter>
+            </task>
+        </layer>
+        <layer type="raster" name="NHcut_1997_1m@NagsHead_series" checked="0" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>NHcut_1997_1m@NagsHead_series</value>
+                </parameter>
+            </task>
+        </layer>
+        <layer type="raster" name="NHcut_1996_1m@NagsHead_series" checked="0" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>NHcut_1996_1m@NagsHead_series</value>
+                </parameter>
+            </task>
+        </layer>
+        <layer type="raster" name="NH_2008_1m@NagsHead_series" checked="0" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>NH_2008_1m@NagsHead_series</value>
+                </parameter>
+            </task>
+        </layer>
+        <layer type="raster" name="NH_2007_1m@NagsHead_series" checked="1" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>NH_2007_1m@NagsHead_series</value>
+                </parameter>
+            </task>
+            <nviz>
+                <surface>
+                    <attribute name="shine" map="0">
+                        <value>60.0</value>
+                    </attribute>
+                    <draw shading="gouraud" style="surface" mode="fine">
+                        <resolution type="coarse">
+                            <value>9</value>
+                        </resolution>
+                        <resolution type="fine">
+                            <value>1</value>
+                        </resolution>
+                        <wire_color>
+                            <value>136:136:136</value>
+                        </wire_color>
+                    </draw>
+                    <position>
+                        <x>0</x>
+                        <y>0</y>
+                        <z>0</z>
+                    </position>
+                </surface>
+            </nviz>
+        </layer>
+        <layer type="raster" name="null@NagsHead_series" checked="0" opacity="1.000000">
+            <selected />
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>null@NagsHead_series</value>
+                </parameter>
+            </task>
+        </layer>
+        <layer type="raster" name="NH_2005_1m@NagsHead_series" checked="0" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>NH_2005_1m@NagsHead_series</value>
+                </parameter>
+            </task>
+        </layer>
+        <layer type="raster" name="NH_2004_1m@NagsHead_series" checked="0" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>NH_2004_1m@NagsHead_series</value>
+                </parameter>
+            </task>
+        </layer>
+        <layer type="raster" name="NH_2001_1m@NagsHead_series" checked="0" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>NH_2001_1m@NagsHead_series</value>
+                </parameter>
+            </task>
+        </layer>
+        <layer type="raster" name="NH_1999_1m@NagsHead_series" checked="0" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>NH_1999_1m@NagsHead_series</value>
+                </parameter>
+            </task>
+        </layer>
+        <nviz_state>
+            <view>
+                <v_position>
+                    <x>0.50</x>
+                    <y>0.87</y>
+                </v_position>
+                <persp>
+                    <value>13</value>
+                    <step>2</step>
+                    <min>1</min>
+                    <max>100</max>
+                </persp>
+                <v_height>
+                    <value>839</value>
+                    <min>-239</min>
+                    <max>359</max>
+                </v_height>
+                <twist>
+                    <value>0</value>
+                    <min>-180</min>
+                    <max>180</max>
+                </twist>
+                <z-exag>
+                    <value>3.00</value>
+                    <min>0</min>
+                    <max>20</max>
+                    <llRatio>1.00</llRatio>
+                </z-exag>
+                <focus>
+                    <x>623</x>
+                    <y>422</y>
+                    <z>8</z>
+                </focus>
+                <background_color>
+                    <value>255:255:255</value>
+                </background_color>
+            </view>
+            <light>
+                <l_position>
+                    <x>0.68</x>
+                    <y>-0.68</y>
+                    <z>80</z>
+                </l_position>
+                <bright>
+                    <value>80</value>
+                </bright>
+                <ambient>
+                    <value>20</value>
+                </ambient>
+                <color>
+                    <value>255:255:255</value>
+                </color>
+            </light>
+        </nviz_state>
+    </display>
+</gxw>

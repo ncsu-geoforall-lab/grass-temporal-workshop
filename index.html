@@ -643,7 +643,7 @@ g.gui.timeline NagsHead_99_08
 </pre>
 
 <p>
-Display 2D animation of space-time raster data set.
+Display animation of space-time raster data set, first just in 2D.
 
 <pre>
 <code class="neutral">
@@ -654,18 +654,24 @@ In main menu use File > Animation tool.
 </code>
 </pre>
 
-<p>
-To display animation in 3D, launch wxGUI,
-add e.g. NH_1999_1m, go to 3D view, set view and resolution, save workspace file.
-In Animation tool, edit animation, choose 3D mode, set workspace file,
-and leave there <tt>elevation_map</tt>.
-Note that 3D in Animation tool (as well as m.nviz.image command bellow)
-is not supported on MS Windows and Mac OS X version 10.7 and older.
-<!-- got black box for 3D animation on 10.6, try it on Mac 10.8. -->
 
 <p>
-For scripting or working in command line, you can save your 3D settings
-as m.nviz.image command using the button on GIS Layer manager (second row).
+We can also display 2D and 3D animation side by side. To display animation in 3D,
+we first have to prepare and store 3D view parameters. To do that, launch GUI if not already launched,
+add e.g. NH_1999_1m, go to 3D view, set view and resolution as desired 
+(see <a href="http://grass.osgeo.org/grass70/manuals/wxGUI.nviz.html#3d-view-layer-manager-toolbox">GUI manual</a>),
+ and save workspace file.
+In Animation tool, add animation, choose 3D mode, set workspace file,
+and leave there <tt>elevation_map</tt>.
+Note that 3D in Animation tool (as well as m.nviz.image command bellow)
+is not supported on MS Windows.
+<p>
+<!-- got black box for 3D animation on 10.6, try it on Mac 10.8. -->
+<img src="./pictures/anim4_result.png" alt="NagsHead series 2D and 3D animation" style="width: 600px;"></img>
+
+<p>
+Sidenote: for scripting or working in command line, you can save your 3D settings
+as m.nviz.image command using the button on GIS Layer manager (second row) called 'Generate command for m.nviz.image'.
 Here is an example of a saved command:
 
 <!-- TODO: implement saving as python -->
@@ -675,8 +681,12 @@ m.nviz.image elevation_map=NH_1999_1m -a mode=fine resolution_fine=1 color_map=N
 </code>
 </pre>
 
+<h3>Space-time cube representation</h3>
 <p>
-Create a 3D raster.
+Space-time cube is 3-dimensional representation where z-coordinate is time.
+We use 3D raster to represent space-time cube with z-coordinates as values of the 3D raster.
+<p>
+To create space-time cube we vertically stack the series of digital elevation models:
 
 <pre>
 <code>
@@ -686,23 +696,44 @@ g.region rast3d=NagsHead_99_08_vol -p3
 </code>
 </pre>
 
-<p>
-If you are getting complaints about different type (FCELL and DCELL),
-check if you did the interpolating and type conversion steps above correctly.
-
 <!-- TODO: see how this is in 70 branch, display legend -->
 <p>
-Now, create a dummy 3D raster for coloring.
+Now, create a new 3D raster which will be used for coloring isosurfaces by years.
 
 <pre>
 <code>
-r3.mapcalc "color_vol = color_vol = if (depth()==1, 1999, if(depth()==2, 2000, if(depth()==3, 2001, if(depth()==4, 2002,if(depth()==5, 2003, if(depth()==6, 2004, if(depth()==7, 2005, if(depth()==8, 2006, if(depth()==9, 2007, 2008)))))))))"
+t.rast.mapcalc inputs=NagsHead_99_08 expression="start_time() + 1999" output=NagsHead_years basename=NagsHead_years nprocs=4
+t.rast.to.rast3 input=NagsHead_years output=NagsHead_years_vol
+
+# set color table of the space-time cube 3D raster
+r3.colors map=NagsHead_99_08_vol color=elevation
 </code>
 </pre>
 
 <p>
-Display in 3D, consider dividing elevation by 10 because we have to use big exaggeration for the 3D raster.
+Now we will display the space-time cube in 3D. Follow the instructions below:
+<pre>
+<code class="gui">
+# set lower resolution to speed up 3D rendering
+g.region -p3 res3=3 tbres=1
 
+# first we add DEM from 2008 which was divided by 20 for visualization purpose in 3D view
+# because we have to use big exaggeration for the 3D raster
+Add raster map layer -> select NH_2008_1m_0.05
+Add various raster map layers -> Add 3D raster map layer -> select NagsHead_99_08_vol
+Right click on 3D raster -> Zoom to selected map
+Paste d.legend command into GUI Command console:
+d.legend -f rast3d=NagsHead_years_vol at=5,50,7,10 use=1999,2000,2001,2002,2003,2004,2005,2006,2007,2008
+Switch to 3D view (be patient)
+On View page, set z-exaggeration to 20 and view height to 100.
+On Data page -> Surface, lower fine mode resolution to 1 or 2
+On Data page -> Volume, add isosurface and then change its value to 11 or similar
+and change the color to use NagsHead_years_vol. Set the isosurface resolution to 1.
+</code>
+</pre>
+
+<p>
+<img src="./pictures/nags_head_nviz.png" alt="NagsHead space-time cube in wxNviz" style="width: 700px;"></img>
 
 <h2>Visualization of solar radiation</h2>
 
