@@ -75,7 +75,7 @@ Data:
 <li>alternative color tables:
     <a href="http://courses.ncsu.edu/mea592/common/Assign_GISmdmodel/temperature_color.txt">temperature</a>,
     <a href="http://courses.ncsu.edu/mea592/common/Assign_GISmdmodel/precip_color.txt">precipitation</a>
-<li>
+</li>
 </ul>
 
 <p>
@@ -246,8 +246,8 @@ Visualize spatio-temporal extents:
 g.gui.timeline tempmean
 </code>
 </pre>
-<img src="./pictures/timeline_tempmean.png" alt="plot of temporal extents of tempmean strds",
-title="Plot of temporal extents of space-time raster dataset tempmean"></img>
+<img src="./pictures/timeline_tempmean.png" alt="plot of temporal extents of tempmean strds"
+title="Plot of temporal extents of space-time raster dataset tempmean"/>
 
 
 
@@ -262,7 +262,7 @@ Query space-time raster dataset in a point and display the values in a plot
 g.gui.tplot inputs=precip_sum coordinates=366165,218084
 </code>
 </pre>
-<img src="./pictures/tplot_precip_sum.png" alt="plot of values from certain coordinate"></img>
+<img src="./pictures/tplot_precip_sum.png" alt="plot of values from certain coordinate"/>
 
 <p>
 Now we will extract one year from both space-time raster datasets.
@@ -285,7 +285,7 @@ t.rast.list input=precip_sum_2010 columns=start_time,min order=min sep="  "
 g.gui.timeline inputs=tempmean,precip_sum,tempmean_2010,precip_sum_2010
 </code>
 </pre>
-<img src="./pictures/timeline_extracted.png" alt="extracted datasets"></img>
+<img src="./pictures/timeline_extracted.png" alt="extracted datasets"/>
 
 <p>
 Now let's look at univariate statistics using t.rast.univar with temporal where option to limit output.
@@ -310,7 +310,7 @@ Run g.gui.animation and <a href="./pictures/anim1.png">add two animations</a>,
 one for <code>tempmean_2010</code> and the other for <code>precip_sum_2010</code> dataset.
 Display legend and set min and max values in legend using the information from t.info.
 <p>
-<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool"></img>
+<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool"/>
 
 <p>
 Change color table if desired (to built-in color table precipitaton_monthly or create your own color table).
@@ -332,7 +332,7 @@ t.list
 </pre>
 <pre>
 <samp>
-Space time raster datasets with absolute time available in mapset <climate_2000_2012>:
+Space time raster datasets with absolute time available in mapset &lt;climate_2000_2012&gt;:
 precip_sum@climate_2000_2012
 tempmean@climate_2000_2012
 </samp>
@@ -367,7 +367,7 @@ distributed to 4 processor cores if available.
 t.rast.extract input=tempmean_seasonal where="strftime('%m', start_time)='06'" expression="(tempmean_seasonal  * 9.0/5.0) + 32" output=tempmean_F_summer base=tempmean_F_summer nprocs=4
 </code>
 </pre>
-<img src="./pictures/timeline_tempmean_seasonal.png" alt="temporal extents of tempmean_seasonal"></img>
+<img src="./pictures/timeline_tempmean_seasonal.png" alt="temporal extents of tempmean_seasonal"/>
 <p>
 Show plot of min and max values of summer periods.
 We will first create a file with those values.
@@ -396,7 +396,7 @@ plt.plotfile("temperatures.txt", cols=(0,1,2), delimiter=',', subplots=False)
 plt.show()
 </code>
 </pre>
-<img src="./pictures/plot_summer_minmax.png" alt="minimum and maximum temperatures in summer"></img>
+<img src="./pictures/plot_summer_minmax.png" alt="minimum and maximum temperatures in summer"/>
 
 
 <p>
@@ -466,7 +466,7 @@ d.rast corr
 d.legend corr
 </code>
 </pre>
-<img src="./pictures/corr.png" alt="temperature and precipitation spatially correlated"></img>
+<img src="./pictures/corr.png" alt="temperature and precipitation spatially correlated"/>
 
 
 <p>
@@ -518,7 +518,7 @@ plt.plotfile("asheville.txt", cols=(0,2), delimiter=',', subplots=False, newfig=
 plt.show()
 </code>
 </pre>
-<img src="./pictures/plot_summer_towns.png" alt="plot of summer temperatures in two towns"></img>
+<img src="./pictures/plot_summer_towns.png" alt="plot of summer temperatures in two towns"/>
 
 <p>
 Now we will display an animation of summer temperature in North Carolina
@@ -529,7 +529,7 @@ Before we display the maps, we set color table of the entire time series.
 t.rast.colors input=tempmean_F_summer color=byr
 g.gui.animation tempmean_F_summer
 </code></pre>
-<img src="./pictures/anim2_result.png" alt="animation of summer temperature in North Carolina"></img>
+<img src="./pictures/anim2_result.png" alt="animation of summer temperature in North Carolina"/>
 
 <h2 id="nagshead-series">NagsHead series</h2>
 
@@ -593,7 +593,7 @@ t.rast.list NagsHead_99_08
 g.gui.timeline NagsHead_99_08
 </code>
 </pre>
-<img src="./pictures/timeline_nagshead_gaps.png" alt="temporal extents of NagsHead dataset"></img>
+<img src="./pictures/timeline_nagshead_gaps.png" alt="temporal extents of NagsHead dataset"/>
 
 
 <p>
@@ -675,7 +675,7 @@ Note that 3D in Animation tool (as well as m.nviz.image command bellow)
 is not supported on MS Windows.
 <p>
 <!-- got black box for 3D animation on 10.6, try it on Mac 10.8. -->
-<img src="./pictures/anim4_result.png" alt="NagsHead series 2D and 3D animation" style="width: 600px;"></img>
+<img src="./pictures/anim4_result.png" alt="NagsHead series 2D and 3D animation" style="width: 600px;"/>
 
 <p>
 Sidenote: for scripting or working in command line, you can save your 3D settings
@@ -741,7 +741,7 @@ and change the color to use NagsHead_years_vol. Set the isosurface resolution to
 </pre>
 
 <p>
-<img src="./pictures/nags_head_nviz.png" alt="NagsHead space-time cube in wxNviz" style="width: 700px;"></img>
+<img src="./pictures/nags_head_nviz.png" alt="NagsHead space-time cube in wxNviz" style="width: 700px;"/>
 
 <h2 id="visualization-of-solar-radiation">Visualization of solar radiation</h2>
 
@@ -807,7 +807,7 @@ Then we launch animation tool and add new animation. Choose 3D, add the computed
 set saved workspace file and choose color_map option to animate.
 Note that 3D animation are not supported on MS Windows.
 <p>
-<img src="./pictures/anim3_result.png" alt="solar radiation animation in 3D"></img>
+<img src="./pictures/anim3_result.png" alt="solar radiation animation in 3D"/>
 
 </p>
 <!-- the last tag must be closed -->
