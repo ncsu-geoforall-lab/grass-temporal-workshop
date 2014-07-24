@@ -825,12 +825,6 @@ r.sun.hourly -t elev_in=elev_lid_small start_time=6 end_time=20 day=200 year=201
 </pre>
 Set custom color table for just created dataset <code>beam</code>:
 <pre>
-<code class="bash">
-echo "0% 60:60:60
-      70% yellow
-      100% 255:70:0" > rules.txt
-t.rast.colors input=beam rules=rules.txt
-</code>
 <code class="gui">
 Use interactive input box in t.rast.colors dialog
 or add the following line with coordinates to a newly created rules.txt file:
@@ -838,6 +832,12 @@ or add the following line with coordinates to a newly created rules.txt file:
 70% yellow
 100% 255:70:0
 
+t.rast.colors input=beam rules=rules.txt
+</code>
+<code class="bash">
+echo "0% 60:60:60
+      70% yellow
+      100% 255:70:0" > rules.txt
 t.rast.colors input=beam rules=rules.txt
 </code>
 </pre>
