@@ -332,7 +332,7 @@ to explore data using again t.rast.list:
 <pre>
 <code>
 # start with simple listing
-t.rast.list tempmean_2010
+t.rast.list input=tempmean_2010
 # we can choose different columns and order
 t.rast.list input=tempmean_2010 columns=name,start_time,end_time,min,max sep="  "
 t.rast.list input=precip_sum_2010 columns=start_time,min order=min sep="  "
@@ -344,7 +344,7 @@ Here we compute univariate statistics using t.rast.univar with temporal 'where' 
 The default separator (pipe) can be changed with separator option.
 <pre>
 <code>
-t.rast.univar -h tempmean_2010 where="start_time &gt; '2010-10-01'"
+t.rast.univar input=tempmean_2010 where="start_time &gt; '2010-10-01'"
 </code>
 </pre>
 <pre>
@@ -630,8 +630,8 @@ and a number of registered maps under 'Metadata information'.
 
 <pre>
 <code>
-t.info -h input=NagsHead_99_08
-t.rast.list NagsHead_99_08
+t.info input=NagsHead_99_08
+t.rast.list input=NagsHead_99_08
 g.gui.timeline NagsHead_99_08
 </code>
 </pre>
@@ -681,7 +681,7 @@ Set the same color table for all maps.
 
 <pre>
 <code>
-t.rast.list -h NagsHead_99_08
+t.rast.list input=NagsHead_99_08
 t.rast.colors input=NagsHead_99_08 raster=NH_1999_1m
 g.gui.timeline NagsHead_99_08
 </code>
