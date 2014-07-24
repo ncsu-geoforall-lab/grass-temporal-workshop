@@ -375,27 +375,39 @@ If you want, set working directory from menu in GUI or by <tt>cd</tt> command,
 otherwise you will have to use full path instead of just a file name.
 
 <pre>
-<code class="bash">
-# you must be in the same directory as you switched GUI to
-# or you must use full path
-t.rast.list -h input=tempmean_F_summer columns=start_time,min,max separator=comma > temperatures.txt
-</code>
 <code class="gui">
-Run t.rast.list and copy output to a file named temperatures.txt
-t.rast.list -h input=tempmean_F_summer columns=start_time,min,max separator=comma
+Run t.rast.list with following parameters:
+
+tab Required: input=tempmean_F_summer
+tab Formatting: separator=comma
+tab Selection: columns=start_time,min,max
+
+Copy output to a file named temperatures.txt.
+Note that you will need full path to the file in the next step.
+Note that some editors add txt extension even when you specify it
+resulting in two txt extensions which may not be visible in some file browsers
+(this is mainly problem on MS Windows).
+</code>
+<code class="bash">
+# you must be in the same current working directory as you use in GUI
+# or you must use full path
+t.rast.list input=tempmean_F_summer columns=start_time,min,max separator=comma > temperatures.txt
 </code>
 </pre>
 
 <p>
-Now go to Python shell tab in the wxGUI and copy and paste:
+Now go to Python shell tab in the wxGUI and copy and paste and execute
+(row by row):
 
 <pre>
 <code class="python">
+# remember to use the full path to the file if necessary
 import matplotlib.pyplot as plt
 plt.plotfile("temperatures.txt", cols=(0,1,2), delimiter=',', subplots=False)
 plt.show()
 </code>
 </pre>
+
 <img src="./pictures/plot_summer_minmax.png" alt="minimum and maximum temperatures in summer"/>
 
 
