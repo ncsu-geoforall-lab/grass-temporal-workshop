@@ -214,7 +214,8 @@ title="Plot of temporal extents of space-time raster dataset tempmean"/>
 
 
 <p>
-Another example of listing maps, this time we aggregate the output with temporal granularity 2 years:
+Another example of listing maps of our registered dataset,
+this time we list maps with temporal resolution (granularity) 2 years:
 
 <pre>
 <code>
@@ -234,38 +235,6 @@ id	name	mapset	start_time	end_time	interval_length	distance_from_begin
 </samp>
 </pre>
 
-<p>
-Get some info about the newly created dataset:
-<pre>
-<code>
-t.info tempmean
-</code>
-</pre>
-
-<p>
-<pre>
-<samp>
-+-------------------- Space Time Raster Dataset -----------------------------+
-|                                                                            |
-+-------------------- Basic information -------------------------------------+
-| Id: ........................ tempmean@climate_2000_2012
-| Name: ...................... tempmean
-| Mapset: .................... climate_2000_2012
-| Creator: ................... anna
-| Temporal type: ............. absolute
-| Creation time: ............. 2014-07-11 12:40:57.473036
-| Modification time:.......... 2014-07-11 12:41:06.799619
-| Semantic type:.............. mean
-+-------------------- Absolute time -----------------------------------------+
-| Start time:................. 2000-01-01 00:00:00
-| End time:................... 2013-01-01 00:00:00
-| Granularity:................ 1 month
-| Temporal type of maps:...... interval
-+-------------------- Spatial extent ----------------------------------------+
-| ...
-</samp>
-</pre>
-
 
 <!--
 comment this out if necessary
@@ -281,7 +250,7 @@ g.gui.tplot inputs=precip_sum coordinates=366165,218084
 <img src="./pictures/tplot_precip_sum.png" alt="plot of values from certain coordinate"/>
 
 <p>
-Now we will extract one year from both space-time raster datasets.
+Now we are going to animate part of the dataset. We will first extract year 2010 from both space-time raster datasets.
 In this case, no new maps are created, the newly created dataset just points to the old maps.
 <pre>
 <code>
@@ -289,22 +258,89 @@ t.rast.extract input=tempmean output=tempmean_2010 where="start_time &gt;= '2010
 t.rast.extract input=precip_sum output=precip_sum_2010 where="start_time &gt;= '2010-01-01' and start_time &lt; '2011-01-01'"
 </code>
 </pre>
-We list the maps in the newly created dataset.
+
+Look at the temporal extents:
 <pre>
-<code>
-# simple listing
-t.rast.list tempmean_2010
-# we can choose different columns and order
-t.rast.list input=tempmean_2010 columns=name,start_time,end_time,min,max sep="  "
-t.rast.list input=precip_sum_2010 columns=start_time,min order=min sep="  "
-# display temporal extents
+<code class="gui">
+Menu: Temporal -> GUI tools -> Plot temporal extents
+Select datasets tempmean, precip_sum, tempmean_2010, precip_sum_2010
+</code>
+<code class="bash">
 g.gui.timeline inputs=tempmean,precip_sum,tempmean_2010,precip_sum_2010
 </code>
 </pre>
 <img src="./pictures/timeline_extracted.png" alt="extracted datasets"/>
 
 <p>
-Now let's look at univariate statistics using t.rast.univar with temporal where option to limit output.
+Create a synchronized animation of two space-time datasets.
+Run g.gui.animation and add animation using these<a href="./pictures/anim1.png">screenshot instructions</a>,
+first for <code>tempmean_2010</code> and later on for <code>precip_sum_2010</code> dataset.
+<p>
+<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool"/>
+
+<p>
+To display legend, we first have to get minimum and maximum values of the entire dataset.
+We get these values by running t.info:
+
+<pre>
+<code>
+t.info tempmean_2010
+</code>
+</pre>
+
+<p>
+<pre>
+<samp>
++-------------------- Space Time Raster Dataset -----------------------------+
+|                                                                            |
++-------------------- Basic information -------------------------------------+
+| ...
++-------------------- Absolute time -----------------------------------------+
+| ..
++-------------------- Spatial extent ----------------------------------------+
+| ...
++-------------------- Metadata information --------------------------------+
+| Raster register table:...... raster_map_register_89c7821c3f174f3e965f481dfbd0c8d7
+| North-South resolution min:. 500.0
+| North-South resolution max:. 500.0
+| East-west resolution min:... 500.0
+| East-west resolution max:... 500.0
+| Minimum value min:.......... -6.464337
+| Minimum value max:.......... 18.54137
+| Maximum value min:.......... 4.247691
+| Maximum value max:.......... 28.805381
+| Aggregation type:........... None
+| Number of registered maps:.. 12
+| ...
+</samp>
+</pre>
+<p>
+In the 'Edit animation' dialog, check legend, set option 'rast' to one of the maps of the dataset,
+and set 'range' option to the min and max values got from t.info.
+
+<p>
+Change color table if desired (to built-in color table precipitaton_monthly or create your own color table).
+To see the change in the animation tool, click on Render map which reloads all maps.
+<pre>
+<code>
+t.rast.colors input=precip_2012 rules=precipitation_monthly
+</code>
+</pre>
+
+Now we go back to the extracted dataset and look at some other options
+to explore data using again t.rast.list:
+<pre>
+<code>
+# start with simple listing
+t.rast.list tempmean_2010
+# we can choose different columns and order
+t.rast.list input=tempmean_2010 columns=name,start_time,end_time,min,max sep="  "
+t.rast.list input=precip_sum_2010 columns=start_time,min order=min sep="  "
+</code>
+</pre>
+
+<p>
+Here we compute univariate statistics using t.rast.univar with temporal 'where' option to limit output.
 The default separator (pipe) can be changed with separator option.
 <pre>
 <code>
@@ -320,30 +356,14 @@ id|start|end|mean|min|max|mean_of_abs|stddev|variance|coeff_var|sum|null_cells|c
 </samp>
 </pre>
 
-<p>
-Create a synchronized animation of two space-time datasets.
-Run g.gui.animation and <a href="./pictures/anim1.png">add two animations</a>,
-one for <code>tempmean_2010</code> and the other for <code>precip_sum_2010</code> dataset.
-Display legend and set min and max values in legend using the information from t.info.
-<p>
-<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool"/>
 
 <p>
-Change color table if desired (to built-in color table precipitaton_monthly or create your own color table).
-To see the change in the animation tool, click on Render map which reloads all maps.
-<pre>
-<code>
-t.rast.colors input=precip_2012 rules=precipitation_monthly
-</code>
-</pre>
-
-<p>
-Now we remove these two extracted spatio-temporal datasets. Note: in this case we remove the just the "container",
+Finally we remove these two extracted spatio-temporal datasets. Note: in this case we remove just the "container",
 not the actual maps.
 <pre>
 <code>
 t.remove inputs=tempmean_2010,precip_sum_2010
-t.list
+t.list type=strds
 </code>
 </pre>
 <pre>
