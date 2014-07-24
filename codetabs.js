@@ -358,8 +358,8 @@ $(document).ready(function() {
         });
         if (generate_others) {
             // add others to autogenerate
-            $(this).append('<code class="python generate"></code>');
             $(this).append('<code class="bash generate"></code>');
+            $(this).append('<code class="python generate"></code>');
             // $(this).append('<code class="gui generate"></code>');
         }
         element = $(this).children('code');
