@@ -29,7 +29,12 @@ GRASS_SCRIPT_PREFIX = "grass."
 
 // link to be used to link modules
 // including the last slash
-GRASS_MANUAL_LINK='http://grass.osgeo.org/grass71/manuals/'
+GRASS_MANUAL_LINK = 'http://grass.osgeo.org/grass71/manuals/'
+GRASS_ADDONS_MANUAL_LINK = 'http://grass.osgeo.org/grass70/manuals/addons/'
+
+// addons we know about
+// only those will be properly linked, the rest will result in broken link
+GRASS_KNOWN_ADDONS = ['r.sun.hourly', 'r.sun.daily', 'r.regression.series']
 
 
 if (!String.prototype.trim) {
@@ -498,13 +503,25 @@ $(document).ready(function() {
         // creating a link around module name
         // the groups 1 and 3 makes sure that we don't match things inside python functions
         // this limit matching of pygrass but any python will be probably necessary to handle separately anyway
-        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.]+[a-zA-Z])(['"`\s\.]|$)/g, '$1<a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a>$3')); 
+        function module_link_code_replacer(match, p1, p2, p3, offset, string){
+            link = GRASS_MANUAL_LINK
+            if (GRASS_KNOWN_ADDONS.indexOf(p2) >= 0)
+                link = GRASS_ADDONS_MANUAL_LINK;
+            return p1 + '<a href="' + link + p2 + '.html" class="modulelink">' + p2 + '</a>' + p3;
+        }
+        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])(['"`\s\.]|$)/g, module_link_code_replacer)); 
     });
 
     $("p").each(function() {
         // putting module to em as a link
         // here the groups before and after should avoid some strange combinations
-        $(this).html($(this).html().replace(/(^|[^a-zA-Z_])([a-z]3?\.[a-zA-Z.]+[a-zA-Z])([^a-zA-Z_]|$)/g, '$1<em><a href="' + GRASS_MANUAL_LINK + '$2.html" class="modulelink">$2</a></em>$3')); 
+        function module_link_par_replacer(match, p1, p2, p3, offset, string){
+            link = GRASS_MANUAL_LINK
+            if (GRASS_KNOWN_ADDONS.indexOf(p2) >= 0)
+                link = GRASS_ADDONS_MANUAL_LINK;
+            return p1 + '<em><a href="' + link + p2 + '.html" class="modulelink">' + p2 + '</a></em>' + p3;
+        }
+        $(this).html($(this).html().replace(/(^|[^a-zA-Z_])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])([^a-zA-Z_]|$)/g, module_link_par_replacer)); 
     });
 
     // this is toc, not code
