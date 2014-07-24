@@ -116,6 +116,7 @@ and precipitation maps from the series to make ourselves familiar with the data.
 
 <pre>
 <code>
+g.mlist type=rast
 g.mlist type=rast pattern="*tempmean"
 g.mlist type=rast pattern="*precip"
 </code>
@@ -123,8 +124,9 @@ g.mlist type=rast pattern="*precip"
 
 <pre>
 <code class="gui">
-Add raster map layer -> select 2000_01_tempmean
-Add raster map layer -> select 2000_01_precip
+In Layer Manager menu: File -> Map display -> Add raster (also available on toolbar)
+Select raster map '2000_01_tempmean'
+In the same way display raster map '2000_01_precip'
 </code>
 <code class="bash">
 # start monitor
@@ -155,12 +157,21 @@ We use g.mlist again (or g.list in future GRASS versions) to list them:
 
 <pre>
 <code class="gui">
-List raster maps with g.mlist:
-    g.mlist type=rast pattern="*tempmean" separator=comma --quiet
-    g.mlist type=rast pattern="*precip" separator=comma --quiet
-And than copy and paste output to maps parameter of t.register:
-    t.register -i input=tempmean type=rast start=2000-01-01 increment="1 months" maps=...
-    t.register -i input=precip_sum type=rast start=2000-01-01 increment="1 months" maps=...
+List temperature raster maps with g.mlist:
+    g.mlist type=rast pattern="*tempmean" --quiet
+
+Then launch t.register and copy and paste output of g.mlist to file parameter of t.register
+(input field under 'or enter values interactively'). In t.register dialog, set additional values:
+
+tab Input: input=tempmean, type=rast
+tab Time Date: start=2000-01-01, increment="1 months", -i
+
+Do the same for precipitation:
+    g.mlist type=rast pattern="*precip" --quiet
+And than copy and paste output to the appropriate field in t.register and use parameters:
+
+tab Input: input=precip_sum, type=rast
+tab Time Date: start=2000-01-01, increment="1 months", -i
 </code>
 <code class="bash">
 # first list maps to check the pattern and output
@@ -183,6 +194,24 @@ t.list type=strds
 t.rast.list input=tempmean sep=tab
 </code>
 </pre>
+
+<p>
+Since the result of t.rast.list is easily parseable but not so easy to read by humans,
+we will visualize the spatio-temporal extents of the dataset:
+
+<pre>
+<code class="gui">
+Menu: Temporal -> GUI tools -> Plot temporal extents
+Select dataset tempmean
+</code>
+<code class="bash">
+g.gui.timeline tempmean
+</code>
+</pre>
+<img src="./pictures/timeline_tempmean.png" alt="plot of temporal extents of tempmean strds"
+title="Plot of temporal extents of space-time raster dataset tempmean"/>
+
+
 
 <p>
 Another example of listing maps, this time we aggregate the output with temporal granularity 2 years:
@@ -236,19 +265,6 @@ t.info tempmean
 | ...
 </samp>
 </pre>
-
-
-<p>
-Visualize spatio-temporal extents:
-
-<pre>
-<code class="neutral">
-g.gui.timeline tempmean
-</code>
-</pre>
-<img src="./pictures/timeline_tempmean.png" alt="plot of temporal extents of tempmean strds"
-title="Plot of temporal extents of space-time raster dataset tempmean"/>
-
 
 
 <!--
