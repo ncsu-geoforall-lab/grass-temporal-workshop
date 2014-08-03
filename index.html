@@ -116,8 +116,9 @@ Start GRASS with location NC_spm_temporal_workshop and mapset climate_2000_2012.
 First we list available raster maps and display the first temperature
 and precipitation maps from the series to make ourselves familiar with the data.
 
+<!-- TODO: things with stdout cannot work with run_command, needs read_command -->
 <pre>
-<code>
+<code class="neutral">
 g.list type=rast
 g.mlist type=rast pattern="*tempmean"
 g.mlist type=rast pattern="*precip"
@@ -287,8 +288,14 @@ We get these values by running t.info. Then, in the 'Edit animation' dialog, che
 set option 'rast' to one of the maps of the dataset,
 and set 'range' option to the min and max values got from t.info.
 <pre>
-<code>
+<code class="neutral">
 t.info tempmean_2010
+</code>
+<code class="bash">
+t.info tempmean_2010
+</code>
+<code class="python">
+grass.read_command('t.info', input='tempmean_2010')
 </code>
 </pre>
 <pre>
@@ -553,7 +560,7 @@ t.vect.observe.strds input=towns strds=tempmean_F_summer output=towns_tempmean_s
 Now we list temperature values:
 
 <pre>
-<code>
+<code class="bash">
 t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 1" > raleigh.txt
 t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 2" > asheville.txt
 </code>
@@ -833,12 +840,6 @@ r.sun.hourly -t elev_in=elev_lid_small start_time=6 end_time=20 day=200 year=201
 </pre>
 Set custom color table for just created dataset <code>beam</code>:
 <pre>
-<code class="bash">
-echo "0% 60:60:60
-      70% yellow
-      100% 255:70:0" > rules.txt
-t.rast.colors input=beam rules=rules.txt
-</code>
 <code class="gui">
 Use interactive input box in t.rast.colors dialog
 or add the following line with coordinates to a newly created rules.txt file:
@@ -846,6 +847,12 @@ or add the following line with coordinates to a newly created rules.txt file:
 70% yellow
 100% 255:70:0
 
+t.rast.colors input=beam rules=rules.txt
+</code>
+<code class="bash">
+echo "0% 60:60:60
+      70% yellow
+      100% 255:70:0" > rules.txt
 t.rast.colors input=beam rules=rules.txt
 </code>
 </pre>
