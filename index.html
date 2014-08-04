@@ -103,7 +103,7 @@ Terminology:
 Notes:
 <ul>
 <li>To run commands in GUI, fill the module
-  parameters into a proper form or just type the type the relevant command
+  parameters into a proper form or just type the relevant command
   into the command console in GUI and press enter.</li>
 </ul>
 
@@ -279,7 +279,8 @@ Create an animation of temperatures in 2010 (as in the picture) by following the
 <p>
 <img src="./pictures/anim1_result1.png" style="width: 400px;" alt="Result from Animation Tool"/>
 <ul>
-<li>Run g.gui.animation and add animation using these <a href="./pictures/anim1.png">screenshot instructions</a>
+<li>Run Animation tool (in menu find Temporal > GUI tools > Animation tool) 
+and add animation using these <a href="./pictures/anim1.png">screenshot instructions</a>
 for <code>tempmean_2010</code>.</li>
 <li> When the animation is done, we can change the time format to better
 suit our case: go to Settings dialog (accessible from toolbar) and choose a suitable format from the drop-down list.</li>
@@ -485,10 +486,13 @@ spatio-temporal datasets yet, just individual maps:
 
 <pre>
 <code class="gui">
-Run g.mlist two times and then use the outputs as inputs to xseries and yseries parameters of
-the r.regression.series module:
+Run g.mlist two times: 
+
     g.mlist type=rast pattern="tempmean_F_summer*" separator=comma --q
     g.mlist type=rast pattern="precip_inch_summer*" separator=comma --q
+
+and then use the outputs as inputs to xseries and yseries parameters of
+the r.regression.series module instead of the dots:
 
     r.regression.series xseries=... yseries=... output=corr method=corcoef
 </code>
@@ -531,17 +535,20 @@ Now we will plot temperatures in Raleigh and Ashville. First we create vector ma
 with sampling locations.
 
 <pre>
-<code class="bash">
-echo "638863,225446
-      287621,210637" | v.in.ascii -t input=- output=towns separator=comma
-</code>
 <code class="gui">
 Use interactive input box in v.in.ascii dialog
 or add the following line with coordinates to a newly created point.txt file:
 638863,225446
 287621,210637
 and use the following parameters:
-v.in.ascii -t input=point.txt output=raleigh separator=comma
+
+tab Required: input=point.txt output=towns 
+tab Input format: separator=comma
+tab Points: -t
+</code>
+<code class="bash">
+echo "638863,225446
+      287621,210637" | v.in.ascii -t input=- output=towns separator=comma
 </code>
 </pre>
 
@@ -560,6 +567,13 @@ t.vect.observe.strds input=towns strds=tempmean_F_summer output=towns_tempmean_s
 Now we list temperature values:
 
 <pre>
+<code class="gui">
+Run t.vect.db.select and get values for Raleigh. Save the result into a text file and name it raleigh.txt:
+    t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 1"
+
+Then get values for Asheville and again save the result into file asheville.txt:
+    t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 2"
+</code>
 <code class="bash">
 t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 1" > raleigh.txt
 t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 2" > asheville.txt
@@ -567,7 +581,8 @@ t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma wh
 </pre>
 
 <p>
-Plot the values using matplotlib (in GUI in Python console):
+Plot the values using matplotlib in GUI in Python console
+(note that this is just basic plotting to avoid more complicated code):
 <pre>
 <code class="python">
 plt.plotfile("raleigh.txt", cols=(0,2), delimiter=',', subplots=False)
@@ -584,8 +599,13 @@ Before we display the maps, we set color table of the entire time series.
 
 <pre><code class="neutral">
 t.rast.colors input=tempmean_F_summer color=byr
-g.gui.animation tempmean_F_summer
+g.gui.animation strds=tempmean_F_summer
 </code></pre>
+
+Open the edit dialog and add vector layer, you can set its properties (change symbol).
+Make sure the vector map layer is above the temperature series layer.
+Also, you can add legend (similarly as in previous animations).
+<p>
 <img src="./pictures/anim2_result.png" alt="animation of summer temperature in North Carolina"/>
 
 <h2 id="nagshead-series">NagsHead series</h2>
@@ -602,6 +622,7 @@ t.create output=NagsHead_99_08 type=strds temporaltype=relative title="Nags Head
 </code>
 </pre>
 
+<!--
 <p>
 Check whether it was successfull:
 <pre>
@@ -609,7 +630,7 @@ Check whether it was successfull:
 t.list type=strds
 </code>
 </pre>
-
+-->
 <p>
 Register maps in the dataset using the list of maps bellow.
 Each map has an associated year. The default separator is a pipe.
@@ -626,7 +647,9 @@ NH_2007_1m|2007
 NH_2008_1m|2008
 
 Also, use the other options bellow:
-t.register input=NagsHead_99_08 type=rast unit=years
+
+tab Input: input=NagsHead_99_08, type=rast
+tab Time Date: unit=years
 </code>
 <code class="bash">
 echo "NH_1999_1m|1999
@@ -655,17 +678,17 @@ g.gui.timeline NagsHead_99_08
 
 <p>
 Since there are gaps in the dataset, we need to interpolate missing data.
-The interpolated maps are already in the mapset so you can skip this step.
-The maps were linearly interpolated with r.series.interp. For interval data,
-you could use t.rast.gapfill.
-
+The interpolated maps are <em>already in the mapset</em> so we will skip this step now.
+(The maps were linearly interpolated with r.series.interp. For interval data,
+you could use t.rast.gapfill.)
+<!--
 <pre>
 <code>
 g.region rast=NH_1999_1m -p
 r.series.interp input=NH_1999_1m,NH_2001_1m,NH_2004_1m,NH_2005_1m,NH_2007_1m,NH_2008_1m datapos=1999,2001,2004,2005,2007,2008 output=NH_2000_1m_interp,NH_2002_1m_interp,NH_2003_1m_interp,NH_2006_1m_interp sampl=2000,2002,2003,2006
 </code>
 </pre>
-
+-->
 <p>
 Now we register interpolated maps to the existing dataset.
 
@@ -710,7 +733,7 @@ Display animation of space-time raster data set, first just in 2D.
 g.gui.animation strds=NagsHead_99_08
 </code>
 <code class="gui">
-In main menu use File > Animation tool.
+In main menu find Temporal > GUI tools > Animation tool.
 </code>
 </pre>
 
@@ -725,7 +748,7 @@ We can also display 2D and 3D animation side by side. To display animation in 3D
 we first have to prepare and store 3D view parameters. To do that, launch GUI if not already launched,
 add e.g. NH_1999_1m, go to 3D view, set view as desired and fine resolution set to 1
 (see <a href="http://grass.osgeo.org/grass70/manuals/wxGUI.nviz.html#3d-view-layer-manager-toolbox">GUI manual</a>),
- and save workspace file.
+ and save workspace file (in menu File -> Workspace -> Save).
 In Animation tool, add animation, choose 3D mode, set workspace file,
 and leave there <tt>elevation_map</tt>.
 Note that 3D in Animation tool (as well as m.nviz.image command bellow)
@@ -770,8 +793,9 @@ Now, create a new 3D raster which will be used for coloring isosurfaces by years
 t.rast.mapcalc inputs=NagsHead_99_08 expression="start_time() + 1999" output=NagsHead_years basename=NagsHead_years nprocs=4
 t.rast.to.rast3 input=NagsHead_years output=NagsHead_years_vol
 
-# set color table of the space-time cube 3D raster
+# set color table of the space-time cube 3D raster and the second 3D raster
 r3.colors map=NagsHead_99_08_vol color=elevation
+r3.colors map=NagsHead_years_vol color=bcyr
 </code>
 </pre>
 
