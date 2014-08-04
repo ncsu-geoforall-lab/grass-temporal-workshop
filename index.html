@@ -81,10 +81,12 @@ Data:
 <p>
 Terminology:
 <ul>
-<li>map in GRASS describes a spatial phenomena, map is stored in GRASS database,
+<li>map in GRASS describes a spatial phenomenon, map is stored in GRASS database,
   it can be raster, vector, or 3D raster (other GIS systems often call this a layer)</li>
+<!--
 <li>raster map usually describes a continuous spatial phenomena, examples include precipitation and aerial image</li>
 <li>vector map usually describes a discrete spatial phenomena, for example meteorological stations</li>
+-->
 <li>3D raster is a three dimensional raster, alternative names include voxel, voxel model and volume</li>
 <li>spatio-temporal dataset in GRASS is a set of GRASS maps registered in GRASS temporal database</li>
 <li>
@@ -117,7 +119,7 @@ and precipitation maps from the series to make ourselves familiar with the data.
 <!-- TODO: things with stdout cannot work with run_command, needs read_command -->
 <pre>
 <code class="neutral">
-g.mlist type=rast
+g.list type=rast
 g.mlist type=rast pattern="*tempmean"
 g.mlist type=rast pattern="*precip"
 </code>
@@ -239,7 +241,7 @@ id	name	mapset	start_time	end_time	interval_length	distance_from_begin
 
 <!--
 comment this out if necessary
--->
+
 <p>
 Query space-time raster dataset in a point and display the values in a plot
 (available only in the newest GRASS GIS 7 version).
@@ -249,7 +251,7 @@ g.gui.tplot inputs=precip_sum coordinates=366165,218084
 </code>
 </pre>
 <img src="./pictures/tplot_precip_sum.png" alt="plot of values from certain coordinate"/>
-
+-->
 <p>
 Now we are going to animate part of the dataset. We will first extract year 2010 from both space-time raster datasets.
 In this case, no new maps are created, the newly created dataset just points to the old maps.
@@ -273,17 +275,18 @@ g.gui.timeline inputs=tempmean,precip_sum,tempmean_2010,precip_sum_2010
 <img src="./pictures/timeline_extracted.png" alt="extracted datasets"/>
 
 <p>
-Create a synchronized animation of two space-time datasets.
-Run g.gui.animation and add animation using these
-<a href="./pictures/anim1.png">screenshot instructions</a>,
-first for <code>tempmean_2010</code> and later on for <code>precip_sum_2010</code> dataset.
+Create an animation of temperatures in 2010 (as in the picture) by following these steps:
 <p>
-<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool"/>
-
-<p>
-To display legend, we first have to get minimum and maximum values of the entire dataset.
-We get these values by running t.info:
-
+<img src="./pictures/anim1_result1.png" style="width: 400px;" alt="Result from Animation Tool"/>
+<ul>
+<li>Run g.gui.animation and add animation using these <a href="./pictures/anim1.png">screenshot instructions</a>
+for <code>tempmean_2010</code>.</li>
+<li> When the animation is done, we can change the time format to better
+suit our case: go to Settings dialog (accessible from toolbar) and choose a suitable format from the drop-down list.</li>
+<li>To display legend, we first have to get minimum and maximum values of the entire dataset.
+We get these values by running t.info. Then, in the 'Edit animation' dialog, check legend,
+set option 'rast' to one of the maps of the dataset,
+and set 'range' option to the min and max values got from t.info.
 <pre>
 <code class="neutral">
 t.info tempmean_2010
@@ -295,8 +298,6 @@ t.info tempmean_2010
 grass.read_command('t.info', input='tempmean_2010')
 </code>
 </pre>
-
-<p>
 <pre>
 <samp>
 +-------------------- Space Time Raster Dataset -----------------------------+
@@ -322,19 +323,25 @@ grass.read_command('t.info', input='tempmean_2010')
 | ...
 </samp>
 </pre>
-<p>
-In the 'Edit animation' dialog, check legend, set option 'rast' to one of the maps of the dataset,
-and set 'range' option to the min and max values got from t.info.
+</li>
 
-<p>
-Change color table if desired (to built-in color table precipitaton_monthly or create your own color table).
+<li>And now add a second animation with <code>precip_sum_2010</code> so that we can see the temperature
+and precipitation synchronized.</li>
+
+<li>Change color table if desired (to built-in color table precipitaton_monthly or create your own color table).
 To see the change in the animation tool, click on Render map which reloads all maps.
 <pre>
 <code>
 t.rast.colors input=precip_2010 color=precipitation_monthly
 </code>
 </pre>
+</li>
+</ul>
+<p>
+<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool"/>
 
+
+<p>
 Now we go back to the extracted dataset and look at some other options
 to explore data using again t.rast.list:
 <pre>
