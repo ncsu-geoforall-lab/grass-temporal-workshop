@@ -102,81 +102,6 @@ pre code {
     padding: 0.5em;
 }
 
-
-/* toc */
-
-
-#table-of-contents h3 {
-    padding-top: 3px;
-    margin-top: 3px;
-    padding-bottom: 3px;
-    margin-bottom: 3px;
-    padding-left: 3px;
-}
-
-#table-of-contents {
-  float: right;
-  width: 20%;
-  background: #eee;
-  font-size: 80%;
-  padding: 2px 2px;
-  margin: 0 0 0.5em 0.5em;
-  
-  border-style:  solid;
-  border-width: 2px;
-  border-radius: 10px;
-  border-color:  rgb(25%, 60%, 25%);
-
-  position: fixed;
-  right: 0;
-  top: 0;
-  background-color:#FFF;
-
-}
-#table-of-contents ul {
-  display: none;
-}
-
-
-#table-of-contents:hover ul {
-  display: block;
-}
-
-#table-of-contents ul {
-  padding-left: 10px;
-}
-
-/*
-#table-of-contents li {
-  margin: 0 0 0.25em 0;
-}
-#table-of-contents li {
-  margin: 1 1 1 1 1;
-}
-*/
-
-
-#table-of-contents a {
-  text-decoration: none;
-}
-#table-of-contents a:hover,
-#table-of-contents a:active {
-  text-decoration: underline;
-}
-
-h3:target {
-  animation: highlight 1s ease;
-}
-
-@keyframes highlight {
-  from { background: yellow; }
-  to { background: white; }
-}
-
-h1, h2, h3, h4, h5, h6 {
-    display: block;
-}
-
 pre code a.modulelink {
     color: inherit;
     text-decoration: none;
@@ -192,4 +117,9 @@ p a.modulelink {
 
 p a.modulelink:hover {
     text-decoration: underline;
+}
+
+pre samp {
+    overflow-x: auto;
+    display: block; /* for overflow-x to work */
 }
