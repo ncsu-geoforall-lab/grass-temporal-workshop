@@ -533,7 +533,10 @@ $(document).ready(function() {
                 link = GRASS_ADDONS_MANUAL_LINK;
             return p1 + '<em><a href="' + link + p2 + '.html" class="modulelink">' + p2 + '</a></em>' + p3;
         }
-        $(this).html($(this).html().replace(/(^|[^a-zA-Z0-9_])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])([^a-zA-Z_]|$)/g, module_link_par_replacer)); 
+        // problem here is that we have no idea what we are matching
+        // and it can be even an URL inside some element attribute
+        // but we probably cannot avoid html() by simple text()
+        $(this).html($(this).html().replace(/(^|[^a-zA-Z0-9_\/])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])([^a-zA-Z0-9_\/]|$)/g, module_link_par_replacer));
     });
 
     // this is toc, not code
