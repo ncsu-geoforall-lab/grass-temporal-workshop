@@ -463,24 +463,41 @@ $(document).ready(function() {
             others.removeClass("visible");
         });
     });
-/*
-    var toc_element = $('<div/>');
+
+    var toc_element_root = $('<div/>');
+    toc_element_root.addClass('toc');
+    toc_element_root.html('<h4 class="notoc toc">Table of contents</h4>')
+    var toc_element = toc_element_root;
     var current_level = 0;
-    $("h1, h2, h3, h4, h5, h6").each(function() {
+    $("h2:not(.notoc), h3:not(.notoc)").each(function() {
         var element = $(this);
         var text = element.text();
-        var id = text.replace(/ /g, "-");
+        var id = text.replace(/ /g, "-").toLowerCase();
         element.attr("id", id);
-        
-        level = parseInt(this.tagName.substring(1));
-        
-        var li = $('<li/>').text(text);
-        
+
+        var level = parseInt(this.tagName.substring(1));
+
+        var li = $('<li/>');
+        li.html('<a href="#' + id + '" class="toc">' + text + '</a>')
+        li.addClass('toc');
+
         if (level > current_level) {
-            toc_element.append($('<ul/>').append(li));
+            var new_subtree = $('<ul/>').append(li)
+            new_subtree.addClass('toc');
+            toc_element.append(new_subtree);
             toc_element = li;
         } else if (level < current_level) {
-            toc_element.parents('ol:eq(' + (current_level - level - 1) + ')').append(li);
+            //a = toc_element.parents('ul:eq(' + (current_level - level - 1) + ')')
+            //a.append(li);
+            //.parent('ul:last')
+            var a = toc_element
+            for (var j = 0; j < current_level - level; j++)
+                console.log(a)
+                a = a.parents('ul:last')
+            //a_level = parseInt(this.tagName.substring(1));
+            //if (a_level - current_level > 1)
+            //    a = a.parents('ul:last')
+            a.append(li);
             toc_element = li;
         } else {
             toc_element.parent().append(li);
@@ -489,14 +506,9 @@ $(document).ready(function() {
         
         current_level = level;
     });
-    
-    
 
-    toc_element = toc_element.parents('ol:last');
-    toc_element.attr('id', 'table-of-contents');
-    console.log(toc_element)
-    $('body').prepend(toc_element)
-*/
+    console.log(toc_element_root)
+    $('body').prepend(toc_element_root)
 
     // link modules to grass documentation
     $("pre code").each(function() {
@@ -521,7 +533,10 @@ $(document).ready(function() {
                 link = GRASS_ADDONS_MANUAL_LINK;
             return p1 + '<em><a href="' + link + p2 + '.html" class="modulelink">' + p2 + '</a></em>' + p3;
         }
-        $(this).html($(this).html().replace(/(^|[^a-zA-Z_])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])([^a-zA-Z_]|$)/g, module_link_par_replacer)); 
+        // problem here is that we have no idea what we are matching
+        // and it can be even an URL inside some element attribute
+        // but we probably cannot avoid html() by simple text()
+        $(this).html($(this).html().replace(/(^|[^a-zA-Z0-9_\/])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])([^a-zA-Z0-9_\/]|$)/g, module_link_par_replacer));
     });
 
     // this is toc, not code

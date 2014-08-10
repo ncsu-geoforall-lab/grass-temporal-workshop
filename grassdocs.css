@@ -14,7 +14,6 @@ body{
     background: white;
     color: black;
     font-family: arial,sans-serif;
-    width: 80%;
 }
 
 hr.header {
@@ -30,6 +29,7 @@ h1{
     font-family: arial,sans-serif;
     font-weight: bold;
     font-size: xx-large;
+    width: 80%; /* avoid collision with toc */
 }
 
 h2{
@@ -54,6 +54,14 @@ h4{
     font-family: arial,sans-serif;
     font-weight: bold;
     font-size: medium;
+}
+
+a {
+    color: #060;
+}
+
+a:visited {
+    color: #060;
 }
 
 div.code{
@@ -104,7 +112,7 @@ td {
 }
 
 div.toc{
-    background-color: transparent;
+    /* background-color: transparent; */
     position: fixed;
     border: solid 1px rgb(25%, 60%, 25%);
     top: 5px;
@@ -115,16 +123,53 @@ div.toc{
 }
 
 li.toc {
-   margin-left: -15px;
+   margin-left: 0;
    padding: 3px 3px 3px 3px;
+   padding-left: 0;
    color: rgb(25%, 60%, 25%);
 }
 
 ul.toc {
    margin-top: 3px;
    margin-bottom: 3px;
+   padding-left: 10%;
+   margin-left: 5%;
 }
 
 a.toc {
     text-decoration: none;
+}
+
+a.toc:hover, a.toc:active {
+    text-decoration: underline;
+}
+
+a:visited {
+    color: #060;
+}
+
+h4.toc {
+    padding-top: 3px;
+    margin-top: 3px;
+    padding-bottom: 3px;
+    margin-bottom: 3px;
+    padding-left: 3px;
+}
+
+/* show and hide toc */
+
+div.toc:hover ul {
+  display: block;
+}
+
+div.toc ul {
+  display: none;
+}
+
+div.toc:hover {
+  background-color: white;
+}
+
+div.toc {
+  background-color: rgba(255, 255, 255, 0.7);
 }
