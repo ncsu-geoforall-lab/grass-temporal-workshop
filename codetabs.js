@@ -344,8 +344,6 @@ $(document).ready(function() {
                 }
                 else {
                     code_element.addClass(NEUTRAL_LANG);
-                    //console.log("add class")
-                    //console.log(".............:" + code_element.text().search(/[^\s][\s][^\s]/g))
                     if (code_element.text().search(/[^\s][\s][^\s]/g) == -1) {
                         small_command = true;
                         generate_others = false;
@@ -409,8 +407,7 @@ $(document).ready(function() {
             lang = NEUTRAL_LANG
             description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;">' + NEUTRAL_LANG_LABEL
         }
-        //console.log(tabcontent.parent().parent().children('ul'))
-        /*closest('tabs-container')*/
+
         var parentid = tabcontent.parent().attr('id');
         var tabid = parentid + '-' + lang;
         tabcontent.attr('id', tabid);
@@ -433,11 +430,7 @@ $(document).ready(function() {
         ul.append(menuitem)
         
         if (tabcontent.hasClass('generate')) {
-            //if (!tabcontent.siblings('.neutral').text()) {
-                //console.log("XXXX-----" + tabcontent.siblings('.neutral').text() + "---------XXXXX")
-            //}
             tabcontent.text(generate_code(tabcontent.siblings(NEUTRAL_LANG_SELECTOR).text(), lang));
-            //console.log(tabcontent[0]);
         } else {
             tabcontent.text(tabcontent.text().trim());
         }
@@ -464,6 +457,7 @@ $(document).ready(function() {
         });
     });
 
+    // table of contents
     var toc_element_root = $('<div/>');
     toc_element_root.addClass('toc');
     toc_element_root.html('<h4 class="notoc toc">Table of contents</h4>')
@@ -487,16 +481,10 @@ $(document).ready(function() {
             toc_element.append(new_subtree);
             toc_element = li;
         } else if (level < current_level) {
-            //a = toc_element.parents('ul:eq(' + (current_level - level - 1) + ')')
-            //a.append(li);
-            //.parent('ul:last')
             var a = toc_element
             for (var j = 0; j < current_level - level; j++)
                 console.log(a)
                 a = a.parents('ul:last')
-            //a_level = parseInt(this.tagName.substring(1));
-            //if (a_level - current_level > 1)
-            //    a = a.parents('ul:last')
             a.append(li);
             toc_element = li;
         } else {
@@ -507,7 +495,6 @@ $(document).ready(function() {
         current_level = level;
     });
 
-    console.log(toc_element_root)
     $('body').prepend(toc_element_root)
 
     // link modules to grass documentation
@@ -538,40 +525,5 @@ $(document).ready(function() {
         // but we probably cannot avoid html() by simple text()
         $(this).html($(this).html().replace(/(^|[^a-zA-Z0-9_\/])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])([^a-zA-Z0-9_\/]|$)/g, module_link_par_replacer));
     });
-
-    // this is toc, not code
-    //var toc = "";
-    //var level = 0;
-
-    //document.getElementById("contents").innerHTML =
-    	//document.getElementById("contents").innerHTML.replace(
-    		///<h([\d])>([^<]+)<\/h([\d])>/gi,
-    		//function (str, openLevel, titleText, closeLevel) {
-    			//if (openLevel != closeLevel) {
-    				//return str;
-    			//}
-
-    			//if (openLevel > level) {
-    				//toc += (new Array(openLevel - level + 1)).join("<ul>");
-    			//} else if (openLevel < level) {
-    				//toc += (new Array(level - openLevel + 1)).join("</ul>");
-    			//}
-
-    			//level = parseInt(openLevel);
-
-    			//var anchor = titleText.replace(/ /g, "-");
-    			//toc += "<li><a href=\"#" + anchor + "\">" + titleText
-    				//+ "</a></li>";
-
-    			//return "<h" + openLevel + "><a name=\"" + anchor + "\">"
-    				//+ titleText + "</a></h" + closeLevel + ">";
-    		//}
-    	//);
-
-    //if (level) {
-    //	toc += (new Array(level + 1)).join("</ul>");
-    //}
-
-    //document.getElementById("table-of-contents").innerHTML += toc;
 
 });
