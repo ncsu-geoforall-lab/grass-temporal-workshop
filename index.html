@@ -782,9 +782,9 @@ To create space-time cube we vertically stack the series of digital elevation mo
 
 <pre>
 <code class="neutral">
-t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08_vol
-r3.info -g map=NagsHead_99_08_vol
-g.region rast3d=NagsHead_99_08_vol -p3
+t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08
+r3.info -g map=NagsHead_99_08
+g.region rast3d=NagsHead_99_08 -p3
 </code>
 </pre>
 
@@ -795,11 +795,11 @@ Now, create a new 3D raster which will be used for coloring isosurfaces by years
 <pre>
 <code>
 t.rast.mapcalc inputs=NagsHead_99_08 expression="start_time() + 1999" output=NagsHead_years basename=NagsHead_years nprocs=4
-t.rast.to.rast3 input=NagsHead_years output=NagsHead_years_vol
+t.rast.to.rast3 input=NagsHead_years output=NagsHead_years
 
 # set color table of the space-time cube 3D raster and the second 3D raster
-r3.colors map=NagsHead_99_08_vol color=elevation
-r3.colors map=NagsHead_years_vol color=bcyr
+r3.colors map=NagsHead_99_08 color=elevation
+r3.colors map=NagsHead_years color=bcyr
 </code>
 </pre>
 
@@ -813,15 +813,15 @@ g.region -p3 res3=3 tbres=1
 # first we add DEM from 2008 which was divided by 20 for visualization purpose in 3D view
 # because we have to use big exaggeration for the 3D raster
 Add raster map layer -> select NH_2008_1m_0.05
-Add various raster map layers -> Add 3D raster map layer -> select NagsHead_99_08_vol
+Add various raster map layers -> Add 3D raster map layer -> select NagsHead_99_08
 Right click on 3D raster -> Zoom to selected map
 Paste d.legend command into GUI Command console:
-d.legend -f rast3d=NagsHead_years_vol at=5,50,7,10 use=1999,2000,2001,2002,2003,2004,2005,2006,2007,2008
+d.legend -f rast3d=NagsHead_years at=5,50,7,10 use=1999,2000,2001,2002,2003,2004,2005,2006,2007,2008
 Switch to 3D view (be patient)
 On View page, set z-exaggeration to 20 and view height to 100.
 On Data page -> Surface, lower fine mode resolution to 1
 On Data page -> Volume, add isosurface and then change its value to 11 or similar
-and change the color to use NagsHead_years_vol. Set the isosurface resolution to 1.
+and change the color to use NagsHead_years. Set the isosurface resolution to 1.
 </code>
 </pre>
 
