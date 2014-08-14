@@ -196,7 +196,7 @@ t.register -i input=precip_sum type=rast start=2000-01-01 increment="1 months" \
 <p>
 Make sure the datasets are created and populated correctly:
 <pre>
-<code>
+<code class="neutral">
 t.list type=strds
 t.rast.list input=tempmean sep=tab
 </code>
@@ -350,7 +350,7 @@ t.rast.colors input=precip_2010 color=precipitation_monthly
 Now we go back to the extracted dataset and look at some other options
 to explore data using again t.rast.list:
 <pre>
-<code>
+<code class="neutral">
 # start with simple listing
 t.rast.list input=tempmean_2010
 # we can choose different columns and order
@@ -363,7 +363,7 @@ t.rast.list input=precip_sum_2010 columns=start_time,min order=min sep="  "
 Here we compute univariate statistics using t.rast.univar with temporal 'where' option to limit output.
 The default separator (pipe) can be changed with separator option.
 <pre>
-<code>
+<code class="neutral">
 t.rast.univar input=tempmean_2010 where="start_time &gt; '2010-10-01'"
 </code>
 </pre>
@@ -381,7 +381,7 @@ id|start|end|mean|min|max|mean_of_abs|stddev|variance|coeff_var|sum|null_cells|c
 Finally we remove these two extracted spatio-temporal datasets. Note: in this case we remove just the "container",
 not the actual maps, as we can see from the output of g.mlist.
 <pre>
-<code>
+<code class="neutral">
 t.remove inputs=tempmean_2010,precip_sum_2010
 t.list type=strds
 g.mlist type=rast pattern="2010*tempmean"
@@ -479,7 +479,7 @@ We will use r.regression.series, which is a GRASS addon. If you don't have it in
 use g.extension to download it from GRASS Addons:
 
 <pre>
-<code>
+<code class="neutral">
 g.extension extension=r.regression.series
 </code>
 </pre>
@@ -671,7 +671,7 @@ Check dataset again, pay special attention to 'Relative time' section
 and a number of registered maps under 'Metadata information'.
 
 <pre>
-<code>
+<code class="neutral">
 t.info input=NagsHead_99_08
 t.rast.list input=NagsHead_99_08
 g.gui.timeline NagsHead_99_08
@@ -722,7 +722,7 @@ Check what you have now in the temporal database.
 Set the same color table for all maps.
 
 <pre>
-<code>
+<code class="neutral">
 t.rast.list input=NagsHead_99_08
 t.rast.colors input=NagsHead_99_08 raster=NH_1999_1m
 g.gui.timeline NagsHead_99_08
@@ -781,7 +781,7 @@ We use 3D raster to represent space-time cube with z-coordinates as values of th
 To create space-time cube we vertically stack the series of digital elevation models:
 
 <pre>
-<code>
+<code class="neutral">
 t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08_vol
 r3.info -g map=NagsHead_99_08_vol
 g.region rast3d=NagsHead_99_08_vol -p3
@@ -840,7 +840,7 @@ We will compute solar radiation during a day for a part of North Carolina State 
 Then we will visualize the change of solar radiation as a 3D animation.
 If you don't have r.sun.hourly, download it:
 
-<pre><code>
+<pre><code class="neutral">
 g.extension extension=r.sun.hourly
 </code></pre>
 
@@ -899,7 +899,7 @@ Note that 3D animation are not supported on MS Windows.
 
 <hr>
 
-<p><i>Last changed: 2014-08-03 23:00</i>
+<p><i>Last changed: 2014-08-13 22:00</i>
 <p>
   <a href="http://grass.osgeo.org/grass71/manuals/">GRASS GIS manual main index</a> |
   <a href="http://grass.osgeo.org/grass71/manuals/temporal.html">Temporal modules index</a> |
