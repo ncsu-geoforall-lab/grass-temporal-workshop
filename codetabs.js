@@ -325,7 +325,7 @@ $(document).ready(function() {
             var text = $(this).children('code').first().text();
             var re_to_replace = /\s|[\.=#\/\\\|"'()\[\]\{\}#%+]/g
             var re_to_replace = /[^a-zA-Z]/g
-            var id = text.substring(0, 50).trim().replace(re_to_replace, '-')
+            var id = text.substring(0, 100).trim().replace(re_to_replace, '-')
             $(this).attr('id', id);
         }
     });
@@ -432,7 +432,11 @@ $(document).ready(function() {
         if (tabcontent.hasClass('generate')) {
             tabcontent.text(generate_code(tabcontent.siblings(NEUTRAL_LANG_SELECTOR).text(), lang));
         } else {
-            tabcontent.text(tabcontent.text().trim());
+            // trim html to save tags for GUI, trim and destroy for others
+            if (tabcontent.hasClass('gui'))
+                tabcontent.html(tabcontent.html().trim());
+            else
+                tabcontent.text(tabcontent.text().trim());
         }
         hljs_lang = lang;
         if (lang == NEUTRAL_LANG)
