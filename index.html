@@ -160,25 +160,37 @@ t.create output=precip_sum type=strds temporaltype=absolute title="Preciptation"
 <p>
 Now we register raster maps into yet empty space-time raster datasets
 with start date 2000-01-01 and interval time with increment 1 month. 
-We use g.mlist again (or g.list in future GRASS versions) to list them:
+We use g.mlist again to list separately temperature and precipitation maps.
+Note that g.mlist lists maps alphabetically which in this case orders the maps
+chronologically which is what we need.
 
 <pre>
 <code class="gui">
+<img style="width: 700px;" src="./pictures/tregister.png" alt="t.register dialog filled"
+title="t.register dialog with filled values"/>
+First click on Clear button under Output window label at the bottom of Layer Manager
 List temperature raster maps with g.mlist:
+
     g.mlist type=rast pattern="*tempmean" --quiet
 
 Then launch t.register and copy and paste output of g.mlist to file parameter of t.register
 (input field under 'or enter values interactively'). In t.register dialog, set additional values:
 
-tab Input: input=tempmean, type=rast
-tab Time Date: start=2000-01-01, increment="1 months", -i
+tab Input > input > tempmean
+tab Time Date > start > 2000-01-01
+              > increment > 1 months
+              > check i flag
 
-Do the same for precipitation:
+Do the same for precipitation, first click on Clear button again to clear the previous list to simplify copying:
+
     g.mlist type=rast pattern="*precip" --quiet
+
 And than copy and paste output to the appropriate field in t.register and use parameters:
 
-tab Input: input=precip_sum, type=rast
-tab Time Date: start=2000-01-01, increment="1 months", -i
+tab Input > input > precip_sum
+tab Time Date > start > 2000-01-01
+              > increment > 1 months
+              > check i flag
 </code>
 <code class="bash">
 # first list maps to check the pattern and output
