@@ -133,7 +133,7 @@ g.mlist type=rast pattern="*precip"
 <code class="gui">
 In Layer Manager menu: File -> Map display -> Add raster (also available on toolbar)
 Select raster map '2000_01_tempmean'
-In the same way display raster map '2000_01_precip'
+Display legend
 </code>
 <code class="bash">
 # start monitor
@@ -166,8 +166,8 @@ chronologically which is what we need.
 
 <pre>
 <code class="gui">
-<img style="width: 700px;" src="./pictures/tregister.png" alt="t.register dialog filled"
-title="t.register dialog with filled values"/>
+<img style="width: 700px;" src="pictures/tregister.png" alt="t register dialog filled" title="t register dialog with filled values">
+<p>
 First click on Clear button under Output window label at the bottom of Layer Manager
 List temperature raster maps with g.mlist:
 
@@ -176,10 +176,10 @@ List temperature raster maps with g.mlist:
 Then launch t.register and copy and paste output of g.mlist to file parameter of t.register
 (input field under 'or enter values interactively'). In t.register dialog, set additional values:
 
-tab Input > input > tempmean
-tab Time Date > start > 2000-01-01
-              > increment > 1 months
-              > check i flag
+tab Input > input > <strong>tempmean</strong>
+tab Time Date > start > <strong>2000-01-01</strong>
+              > increment > <strong>1 months</strong>
+              > check <strong>i</strong> flag
 
 Do the same for precipitation, first click on Clear button again to clear the previous list to simplify copying:
 
@@ -187,10 +187,11 @@ Do the same for precipitation, first click on Clear button again to clear the pr
 
 And than copy and paste output to the appropriate field in t.register and use parameters:
 
-tab Input > input > precip_sum
-tab Time Date > start > 2000-01-01
-              > increment > 1 months
-              > check i flag
+tab Input > input > <strong>precip_sum</strong>
+tab Time Date > start > <strong>2000-01-01</strong>
+              > increment > <strong>1 months</strong>
+              > check <strong>i</strong> flag
+</p>
 </code>
 <code class="bash">
 # first list maps to check the pattern and output
@@ -291,28 +292,28 @@ g.gui.timeline inputs=tempmean,precip_sum,tempmean_2010,precip_sum_2010
 <img src="./pictures/timeline_extracted.png" alt="extracted datasets"/>
 
 <p>
-Create an animation of temperatures in 2010 (as in the picture) by following these steps:
+Create an animation of precipitation in 2010 (as in the picture) by following these steps:
 <p>
 <img src="./pictures/anim1_result1.png" style="width: 400px;" alt="Result from Animation Tool (one animation)"/>
 <ul>
 <li>Run Animation tool (in menu find Temporal > GUI tools > Animation tool) 
 and add animation using these <a href="./pictures/anim1.png">screenshot instructions</a>
-for <code>tempmean_2010</code>.</li>
+for <code>precip_sum_2010</code>.</li>
 <li> When the animation is done, we can change the time format to better
 suit our case: go to Settings dialog (accessible from toolbar) and choose a suitable format from the drop-down list.</li>
 <li>To display legend, we first have to get minimum and maximum values of the entire dataset.
 We get these values by running t.info. Then, in the 'Edit animation' dialog, check legend,
 set option 'rast' to one of the maps of the dataset,
-and set 'range' option to the min and max values got from t.info.
+and set 'range' option to the min and max values got from t.info (in the format min,max).
 <pre>
 <code class="neutral">
-t.info tempmean_2010
+t.info precip_sum_2010
 </code>
 <code class="bash">
-t.info tempmean_2010
+t.info precip_sum_2010
 </code>
 <code class="python">
-grass.read_command('t.info', input='tempmean_2010')
+grass.read_command('t.info', input='precip_sum_2010')
 </code>
 </pre>
 <pre>
@@ -331,10 +332,10 @@ grass.read_command('t.info', input='tempmean_2010')
 | North-South resolution max:. 500.0
 | East-west resolution min:... 500.0
 | East-west resolution max:... 500.0
-| Minimum value min:.......... -6.464337
-| Minimum value max:.......... 18.54137
-| Maximum value min:.......... 4.247691
-| Maximum value max:.......... 28.805381
+| Minimum value min:.......... 6.275055
+| Minimum value max:.......... 84.408674
+| Maximum value min:.......... 185.205301
+| Maximum value max:.......... 436.309366
 | Aggregation type:........... None
 | Number of registered maps:.. 12
 | ...
@@ -342,38 +343,41 @@ grass.read_command('t.info', input='tempmean_2010')
 </pre>
 </li>
 
-<li>And now add a second animation with <code>precip_sum_2010</code> so that we can see the temperature
-and precipitation synchronized.</li>
-
 <li>Change color table if desired (to built-in color table precipitaton_monthly or create your own color table).
-To see the change in the animation tool, click on Render map which reloads all maps.
+To see the change in the animation tool, click on Render map in the toolbar which reloads all maps.
 <pre>
 <code>
 t.rast.colors input=precip_sum_2010 color=precipitation_monthly
 </code>
 </pre>
+
+<li>And now add a second animation with <code>tempmean_2010</code> so that we can see the temperature
+and precipitation synchronized. Use the same <a href="./pictures/anim1.png">screenshot instructions</a> as before,
+just use <code>tempmean_2010</code> instead of <code>precip_sum_2010</code>.</li>
+
+<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool (two animations)"/>
 </li>
 </ul>
-<p>
-<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool (two animations)"/>
+
 
 
 <p>
 Now we go back to the extracted dataset and look at some other options
-to explore data using again t.rast.list:
+to explore data using again t.rast.list. We can for example choose which columns to print, and the order of records.
+In this case we print the time and monthly minimum of precipitation to get the information
+which months in 2010 had the highest maximum values.
+The default separator (pipe) can be changed with separator option.
+
 <pre>
 <code class="neutral">
-# start with simple listing
-t.rast.list input=tempmean_2010
 # we can choose different columns and order
-t.rast.list input=tempmean_2010 columns=name,start_time,end_time,min,max sep="  "
-t.rast.list input=precip_sum_2010 columns=start_time,min order=min sep="  "
+t.rast.list input=precip_sum_2010 columns=start_time,max order=max sep=tab
 </code>
 </pre>
 
 <p>
-Here we compute univariate statistics using t.rast.univar with temporal 'where' option to limit output.
-The default separator (pipe) can be changed with separator option.
+Here we compute univariate statistics using t.rast.univar with temporal 'where' option
+to limit output to last 3 months of the year 2010.
 <pre>
 <code class="neutral">
 t.rast.univar input=tempmean_2010 where="start_time &gt; '2010-10-01'"
@@ -392,6 +396,8 @@ id|start|end|mean|min|max|mean_of_abs|stddev|variance|coeff_var|sum|null_cells|c
 <p>
 Finally we remove these two extracted spatio-temporal datasets. Note: in this case we remove just the "container",
 not the actual maps, as we can see from the output of g.mlist.
+Module t.remove enables to remove the actual data, too,
+using appropriate flags, but we will not do that now, since we still need the data.
 <pre>
 <code class="neutral">
 t.remove inputs=tempmean_2010,precip_sum_2010
@@ -440,9 +446,9 @@ otherwise you will have to use full path instead of just a file name.
 <code class="gui">
 Run t.rast.list with following parameters:
 
-tab Required: input=tempmean_F_summer
-tab Formatting: separator=comma
-tab Selection: columns=start_time,min,max
+tab Required > input > tempmean_F_summer
+tab Formatting > separator > comma
+tab Selection > columns > start_time,min,max
 
 Copy output to a file named temperatures.txt.
 Note that you will need full path to the file in the next step.
@@ -558,9 +564,10 @@ or add the following line with coordinates to a newly created point.txt file:
 287621,210637
 and use the following parameters:
 
-tab Required: input=point.txt output=towns 
-tab Input format: separator=comma
-tab Points: -t
+tab Required > input > point.txt 
+             > output > towns 
+tab Input format > separator > comma
+tab Points > -t flag
 </code>
 <code class="bash">
 echo "638863,225446
