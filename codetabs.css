@@ -124,12 +124,12 @@ pre samp {
     display: block; /* for overflow-x to work */
 }
 
-/* div to override pre style
+/* class to override pre style
    pre tag required for tabs system
    Using this for all code.gui not allow to do quick GUI pre-formatted guides
    which we want as default.
 */
-div.text {
+.text {
     white-space: normal;
     font-family: arial,sans-serif;
     font-size: initial;
