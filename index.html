@@ -169,7 +169,7 @@ chronologically which is what we need.
 <pre>
 <code class="gui">
 <img style="width: 700px;" src="pictures/tregister.png" alt="t register dialog filled" title="t register dialog with filled values">
-<p>
+
 First click on Clear button under Output window label at the bottom of Layer Manager
 List temperature raster maps with g.mlist:
 
@@ -193,7 +193,7 @@ tab Input > input > <strong>precip_sum</strong>
 tab Time Date > start > <strong>2000-01-01</strong>
               > increment > <strong>1 months</strong>
               > check <strong>i</strong> flag
-</p>
+
 </code>
 <code class="bash">
 # first list maps to check the pattern and output
@@ -299,7 +299,7 @@ Create an animation of precipitation in 2010 (as in the picture) by following th
 <img src="./pictures/anim1_result1.png" style="width: 400px;" alt="Result from Animation Tool (one animation)"/>
 <ul>
 <li>Run Animation tool (in menu find Temporal > GUI tools > Animation tool) 
-and add animation using these <a href="./pictures/anim1.png">screenshot instructions</a>
+and add animation using these <a target="_blank" href="./pictures/anim1.png">screenshot instructions</a>
 for <code>precip_sum_2010</code>.</li>
 <li> When the animation is done, we can change the time format to better
 suit our case: go to Settings dialog (accessible from toolbar) and choose a suitable format from the drop-down list.</li>
@@ -355,8 +355,8 @@ t.rast.colors input=precip_sum_2010 color=precipitation_monthly
 
 <li>And now add a second animation with <code>tempmean_2010</code> so that we can see the temperature
 and precipitation synchronized. Use the same <a href="./pictures/anim1.png">screenshot instructions</a> as before,
-just use <code>tempmean_2010</code> instead of <code>precip_sum_2010</code>.</li>
-
+just use <code>tempmean_2010</code> instead of <code>precip_sum_2010</code>.
+<p>
 <img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool (two animations)"/>
 </li>
 </ul>
@@ -410,7 +410,7 @@ g.mlist type=rast pattern="2010*tempmean"
 
 
 
-<h3>Time series analysis</h3>
+<h3>Temporal aggregation</h3>
 
 <p>
 We will start by computing average temperature for each season of the year (we use term aggregation).
@@ -438,53 +438,30 @@ t.rast.extract input=tempmean_seasonal where="strftime('%m', start_time)='06'" e
 </code>
 </pre>
 <img src="./pictures/timeline_tempmean_seasonal.png" alt="temporal extents of tempmean_seasonal"/>
-<p>
-Show plot of min and max values of summer periods.
-We will first create a file with those values.
-If you want, set working directory from menu in GUI or by <tt>cd</tt> command,
-otherwise you will have to use full path instead of just a file name.
-
-<pre>
-<code class="gui">
-Run t.rast.list with following parameters:
-
-tab Required > input > tempmean_F_summer
-tab Formatting > separator > comma
-tab Selection > columns > start_time,min,max
-
-Copy output to a file named temperatures.txt.
-Note that you will need full path to the file in the next step.
-Note that some editors add txt extension even when you specify it
-resulting in two txt extensions which may not be visible in some file browsers
-(this is mainly problem on MS Windows).
-</code>
-<code class="bash">
-# you must be in the same current working directory as you use in GUI
-# or you must use full path
-t.rast.list input=tempmean_F_summer columns=start_time,min,max separator=comma > temperatures.txt
-</code>
-</pre>
 
 <p>
-Now go to Python shell tab in the wxGUI and copy and paste and execute
-(row by row):
+Now we will display an animation of summer temperatures in North Carolina
+and we will overlay static vector map of counties' boundaries and semi-transparent shaded relief.
 
-<pre>
-<code class="python">
-# remember to use the full path to the file if necessary
-import matplotlib.pyplot as plt
-plt.plotfile("temperatures.txt", cols=(0,1,2), delimiter=',', subplots=False)
-plt.show()
-</code>
-</pre>
+Before we display the maps, we set color table of the entire time series. 
 
-<img src="./pictures/plot_summer_minmax.png" alt="minimum and maximum temperatures in summer"/>
+<pre><code class="neutral">
+t.rast.colors input=tempmean_F_summer color=byr
+</code></pre>
 
+Launch Animation tool, add new animation. We will this time add more layers,
+one time-series of temperatures <tt>tempmean_F_summer</tt>, one static vector map of boundaries <tt>boundary_county</tt>
+and one static semi-transparent raster map (shaded relief) <tt>shaded_state_500m</tt>.
+The vector and raster maps are located in mapset PERMANENT. After adding maps and setting opacity,
+make sure the layers are in the right order. <a target="_blank" href="./pictures/anim_layers.png" >Screenshot instructions are here</a>.
+Also, you can add legend (similarly as in previous animations) for temperature values.
+<p>
+<img src="./pictures/anim2_result.png" alt="animation of summer temperature in North Carolina"/>
 
 <p>
-Let's do the same with precipitation dataset in a different way.
+Let's do the same aggregation with precipitation dataset in a different way.
 Aggregate data using time intervals of tempmean_F_summer.
-Convert millimeters to inches.
+Convert millimeters to inches. The result will be mean of summer monthly precipitation in inches.
 
 <pre>
 <code>
@@ -493,8 +470,9 @@ t.rast.mapcalc inputs=precip_summer expression="precip_summer / 25.4" output=pre
 </code>
 </pre>
 
+<h3>Is precipitation and temperature correlated?</h3>
 <p>
-Is precipitation and temperature correlated?
+
 We will use r.regression.series, which is a GRASS addon. If you don't have it installed,
 use g.extension to download it from GRASS Addons:
 
@@ -539,7 +517,7 @@ r.colors map=corr color=differences
 
 <p>
 Now we can explore the map <code>corr</code> showing mostly negative
-spatial correlation between temperature and precipitation.
+spatial correlation between temperature and precipitation during summer.
 <pre>
 <code class="gui">
 Add raster map layer -> select corr
@@ -554,32 +532,53 @@ d.legend corr
 <img src="./pictures/corr.png" alt="temperature and precipitation spatially correlated"/>
 
 
+<h3>Plot min/max values of summer temperature and precipitation</h3>
+
 <p>
-Now we will plot temperatures in Raleigh and Ashville. First we create vector maps
-with sampling locations.
+Show plot of min and max values of summer periods.
+We will first create a file with those values. To simplify things,
+paste the following command into terminal (not the GUI command console, that wouldn't work).
 
 <pre>
-<code class="gui">
-Use interactive input box in v.in.ascii dialog
-or add the following line with coordinates to a newly created point.txt file:
-638863,225446
-287621,210637
-and use the following parameters:
-
-tab Required > input > point.txt 
-             > output > towns 
-tab Input format > separator > comma
-tab Points > -t flag
-</code>
 <code class="bash">
-echo "638863,225446
-      287621,210637" | v.in.ascii -t input=- output=towns separator=comma
+# this will create file in the current directory
+t.rast.list input=tempmean_F_summer columns=start_time,min,max separator=comma > temperatures.txt
+</code>
+<code class="gui">
+Run t.rast.list with following parameters:
+
+tab Required > input > tempmean_F_summer
+tab Formatting > separator > comma
+tab Selection > columns > start_time,min,max
+
+Copy output to a file named temperatures.txt.
+Note that you will need full path to the file in the next step.
+Note that some editors add txt extension even when you specify it
+resulting in two txt extensions which may not be visible in some file browsers
+(this is mainly problem on MS Windows).
 </code>
 </pre>
 
-
 <p>
-Then, using t.vect.observe.strds, we create a space-time vector dataset
+Now go to Python shell tab in the wxGUI and copy and paste and execute
+(row by row):
+
+<pre>
+<code class="python">
+# remember to use the full path to the file if necessary
+import matplotlib.pyplot as plt
+plt.plotfile("temperatures.txt", cols=(0,1,2), delimiter=',', subplots=False)
+plt.show()
+</code>
+</pre>
+
+<img src="./pictures/plot_summer_minmax.png" alt="minimum and maximum temperatures in summer"/>
+
+<h3>Plot temperatures in Raleigh and Ashville	</h3>
+<p>
+Now we will plot temperatures in Raleigh and Ashville. You can find vector map <tt>towns</tt> in mapset PERMANENT.
+It contains 2 points representing Raleigh and Ashville.
+Using t.vect.observe.strds, we create a space-time vector dataset
 with values of summer temperature in those two locations stored in the attribute tables:
 
 <pre>
@@ -610,6 +609,7 @@ Plot the values using matplotlib in GUI in Python console
 (note that this is just basic plotting to avoid more complicated code):
 <pre>
 <code class="python">
+import matplotlib.pyplot as plt
 plt.plotfile("raleigh.txt", cols=(0,2), delimiter=',', subplots=False)
 plt.plotfile("asheville.txt", cols=(0,2), delimiter=',', subplots=False, newfig=False)
 plt.show()
@@ -617,28 +617,13 @@ plt.show()
 </pre>
 <img src="./pictures/plot_summer_towns.png" alt="plot of summer temperatures in two towns"/>
 
-<p>
-Now we will display an animation of summer temperature in North Carolina
-and we will overlay the vector points representing the two towns.
-Before we display the maps, we set color table of the entire time series.
-
-<pre><code class="neutral">
-t.rast.colors input=tempmean_F_summer color=byr
-g.gui.animation strds=tempmean_F_summer
-</code></pre>
-
-Open the edit dialog and add vector layer, you can set its properties (change symbol).
-Make sure the vector map layer is above the temperature series layer.
-Also, you can add legend (similarly as in previous animations).
-<p>
-<img src="./pictures/anim2_result.png" alt="animation of summer temperature in North Carolina"/>
 
 <h2 id="nagshead-series">NagsHead series</h2>
 
-<p>
 Start grass7 with location NC_spm_temporal_workshop and mapset NaghHead_series.
 
-<p>
+<h3>Time series registration and visualization</h3>
+
 First, we create an empty space-time raster dataset. We will use relative time with years as units.
 
 <pre>
