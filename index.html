@@ -134,13 +134,15 @@ g.mlist type=rast pattern="*precip"
 In Layer Manager menu: File -> Map display -> Add raster (also available on toolbar)
 Select raster map '2000_01_tempmean'
 Display legend
+
+<img style="width: 600px;" src="pictures/scr_legend.png" alt="display precipitation map and legend" title="display precipitation map and legend">
 </code>
 <code class="bash">
 # start monitor
 d.mon wx0
 # display raster maps
 d.rast 2000_01_tempmean
-d.rast 2000_01_precip
+d.legend 2000_01_tempmean
 </code>
 </pre>
 
