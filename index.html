@@ -673,8 +673,8 @@ NH_2008_1m|2008
 
 Also, use the other options bellow:
 
-tab Input: input=NagsHead_99_08, type=rast
-tab Time Date: unit=years
+tab Input > input > NagsHead_99_08
+tab Time Date > unit > years
 </code>
 <code class="bash">
 echo "NH_1999_1m|1999
@@ -688,21 +688,14 @@ t.register input=NagsHead_99_08 type=rast file=NH.txt unit=years
 </pre>
 
 <p>
-Check dataset again, pay special attention to 'Relative time' section
-and a number of registered maps under 'Metadata information'.
-
-<pre>
-<code class="neutral">
-t.info input=NagsHead_99_08
-t.rast.list input=NagsHead_99_08
-g.gui.timeline NagsHead_99_08
-</code>
-</pre>
+By displaying temporal extents of the newly created dataset with Timeline tool,
+we can see that each map is registered as an instance (not interval) and there are time gaps in the dataset.
+<p>
 <img src="./pictures/timeline_nagshead_gaps.png" alt="temporal extents of NagsHead dataset"/>
 
 
 <p>
-Since there are gaps in the dataset, we need to interpolate missing data.
+Since there are gaps in the dataset, we decided to interpolate missing data.
 The interpolated maps are <em>already in the mapset</em> so we will skip this step now.
 (The maps were linearly interpolated with r.series.interp. For interval data,
 you could use t.rast.gapfill.)
@@ -715,12 +708,12 @@ r.series.interp input=NH_1999_1m,NH_2001_1m,NH_2004_1m,NH_2005_1m,NH_2007_1m,NH_
 </pre>
 -->
 <p>
-Now we register interpolated maps to the existing dataset.
+We still have to register interpolated maps to the existing dataset.
 
 <pre>
 <code class="gui">
 Use interactive input for the file option in the dialog of t.register
-module. Use parameters input=NagsHead_99_08 and unit=years.
+module. Use parameters input > NagsHead_99_08 and unit > years.
 Here is the list of maps to be registered including the time stamps:
 
 NH_2000_1m_interp|2000
@@ -739,26 +732,25 @@ t.register input=NagsHead_99_08 file=interp.txt unit=years
 </pre>
 
 <p>
-Check what you have now in the temporal database.
-Set the same color table for all maps.
+Check what you have now in <tt>NagsHead_99_08</tt> dataset.
+Set the same color table for all maps (copy the color table from map <tt>NH_1999_1m</tt>).
 
 <pre>
 <code class="neutral">
 t.rast.list input=NagsHead_99_08
 t.rast.colors input=NagsHead_99_08 raster=NH_1999_1m
-g.gui.timeline NagsHead_99_08
 </code>
 </pre>
 
 <p>
-Display animation of space-time raster data set, first just in 2D.
+Display animation of space-time raster data set <tt>NagsHead_99_08</tt>, first just in 2D.
 
 <pre>
-<code class="neutral">
-g.gui.animation strds=NagsHead_99_08
-</code>
 <code class="gui">
 In main menu find Temporal > GUI tools > Animation tool.
+</code>
+<code class="neutral">
+g.gui.animation strds=NagsHead_99_08
 </code>
 </pre>
 
@@ -775,7 +767,7 @@ add e.g. NH_1999_1m, go to 3D view, set view as desired and fine resolution set 
 (see <a href="http://grass.osgeo.org/grass70/manuals/wxGUI.nviz.html#3d-view-layer-manager-toolbox">GUI manual</a>),
  and save workspace file (in menu File -> Workspace -> Save).
 In Animation tool, add animation, choose 3D mode, set workspace file,
-and leave there <tt>elevation_map</tt>.
+and leave there <tt>elevation_map</tt> as the parameter to animate.
 Note that 3D in Animation tool (as well as m.nviz.image command bellow)
 is not supported on MS Windows.
 <p>
@@ -799,12 +791,14 @@ m.nviz.image elevation_map=NH_1999_1m -a mode=fine resolution_fine=1 color_map=N
 Space-time cube is 3-dimensional representation where z-coordinate is time.
 We use 3D raster to represent space-time cube with z-coordinates as values of the 3D raster.
 <p>
-To create space-time cube we vertically stack the series of digital elevation models:
+To create space-time cube we vertically stack the series of digital elevation models using t.rast.to.rast3:
 
 <pre>
 <code class="neutral">
 t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08
+# check 3D extent and min and max values
 r3.info -g map=NagsHead_99_08
+# set region to this 3D raster for further processing
 g.region rast3d=NagsHead_99_08 -p3
 </code>
 </pre>
@@ -812,6 +806,8 @@ g.region rast3d=NagsHead_99_08 -p3
 <!-- TODO: see how this is in 70 branch, display legend -->
 <p>
 Now, create a new 3D raster which will be used for coloring isosurfaces by years.
+Using t.rast.mapcalc we create a series of single-value raster maps for each year
+and then we stack them into a 3D raster and set a suitable color table.
 
 <pre>
 <code>
