@@ -2,7 +2,7 @@ Spatio-temporal data handling and visualization in GRASS GIS
 ============================================================
 
 Spatio-temporal data handling and visualization in GRASS GIS workshop
-was created for FOSS4G 2014 converence in Portland, Oregon.
+was created for FOSS4G 2014 conference in Portland, Oregon.
 
 Online version
 --------------
