@@ -29,11 +29,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 TODO:
  * support for long flags
  * first/one parameter without option name is not supported
- * support for links to addons
- * (wouldn't be actually better if addons would be mixed with standard commands in online manual?')
  * support general tabs (requires adding a class to the pre code tabs)
- * support GUI tab which would be a general div (switch of pre?)
- * numbers in python code (is_python_number fucntion/regexp)
+ * support GUI tab which would be a general div (not something inside of pre)
+ * numbers in python code (is_python_number fucntion/regexp) as numbers, not strings
+ * select all button for code tabs (really needed, often line by line copying necessary anyway)
+ * help button for code tabs
+ * switch all tabs at once button
+ * hide some tabs buttons
 
 */
 
@@ -527,19 +529,20 @@ $(document).ready(function() {
 
     $('body').prepend(toc_element_root)
 
+    // we are not linking modules because it makes selecting easier
     // link modules to grass documentation
-    $("pre code").each(function() {
-        // creating a link around module name
-        // the groups 1 and 3 makes sure that we don't match things inside python functions
-        // this limit matching of pygrass but any python will be probably necessary to handle separately anyway
-        function module_link_code_replacer(match, p1, p2, p3, offset, string){
-            link = GRASS_MANUAL_LINK
-            if (GRASS_KNOWN_ADDONS.indexOf(p2) >= 0)
-                link = GRASS_ADDONS_MANUAL_LINK;
-            return p1 + '<a href="' + link + p2 + '.html" class="modulelink">' + p2 + '</a>' + p3;
-        }
-        $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])(['"`\s\.]|$)/g, module_link_code_replacer)); 
-    });
+    // $("pre code").each(function() {
+    //     // creating a link around module name
+    //     // the groups 1 and 3 makes sure that we don't match things inside python functions
+    //     // this limit matching of pygrass but any python will be probably necessary to handle separately anyway
+    //     function module_link_code_replacer(match, p1, p2, p3, offset, string){
+    //         link = GRASS_MANUAL_LINK
+    //         if (GRASS_KNOWN_ADDONS.indexOf(p2) >= 0)
+    //             link = GRASS_ADDONS_MANUAL_LINK;
+    //         return p1 + '<a href="' + link + p2 + '.html" class="modulelink">' + p2 + '</a>' + p3;
+    //     }
+    //     $(this).html($(this).html().replace(/(^|['"`\s\.])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])(['"`\s\.]|$)/g, module_link_code_replacer)); 
+    // });
 
     $("p").each(function() {
         // putting module to em as a link
