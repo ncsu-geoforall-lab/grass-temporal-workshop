@@ -1,4 +1,30 @@
 /*
+Copyright (c) 2014, Vaclav Petras, NCSU OSGeoREL
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+* are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/*
 
 TODO:
  * support for long flags
@@ -527,6 +553,8 @@ $(document).ready(function() {
         // problem here is that we have no idea what we are matching
         // and it can be even an URL inside some element attribute
         // but we probably cannot avoid html() by simple text()
+        // the same applies also to pre code once some HTML is used there
+        // which is the case of standard text put to pre for GUI tab
         $(this).html($(this).html().replace(/(^|[^a-zA-Z0-9_\/])([a-z]3?\.[a-zA-Z.0-9]+[a-zA-Z0-9])([^a-zA-Z0-9_\/]|$)/g, module_link_par_replacer));
     });
 
