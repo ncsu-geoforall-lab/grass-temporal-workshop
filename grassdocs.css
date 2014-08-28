@@ -16,6 +16,11 @@ body{
     font-family: arial,sans-serif;
 }
 
+p, ul{
+    line-height: 130%;
+    -webkit-margin-before: 0.25em;
+}
+
 hr.header {
     height: 3px;
     color: gray;
@@ -38,6 +43,10 @@ h2{
     font-family: arial,sans-serif;
     font-weight: bold;
     font-size: x-large;
+    padding-top: 0.8em;
+    padding-bottom: 0.1em;
+    margin: 0px;
+    -webkit-margin-after: 0.1em;
 }
 
 h3{
@@ -46,6 +55,10 @@ h3{
     font-family: arial,sans-serif;
     font-weight: bold;
     font-size: large;
+    padding-top: 0.8em;
+    padding-bottom: 0em;
+    margin: 0px;
+    -webkit-margin-after: 0.1em;
 }
 
 h4{
@@ -172,4 +185,8 @@ div.toc:hover {
 
 div.toc {
   background-color: rgba(255, 255, 255, 0.7);
+}
+
+img {
+  padding: 10px
 }
