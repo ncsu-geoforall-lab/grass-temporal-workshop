@@ -372,6 +372,9 @@ The default separator (pipe) can be changed with separator option.
 
 <pre>
 <code class="neutral">
+t.rast.list input=precip_sum_2010 columns=start_time,max order=max sep=tab
+</code>
+<code class="bash">
 # we can choose different columns and order
 t.rast.list input=precip_sum_2010 columns=start_time,max order=max sep=tab
 </code>
@@ -781,6 +784,12 @@ To create space-time cube we vertically stack the series of digital elevation mo
 <pre>
 <code class="neutral">
 t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08
+r3.info -g map=NagsHead_99_08
+g.region rast3d=NagsHead_99_08 -p3
+</code>
+<code class="bash">
+# convert strds to 3D raster
+t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08
 # check 3D extent and min and max values
 r3.info -g map=NagsHead_99_08
 # set region to this 3D raster for further processing
@@ -798,8 +807,13 @@ and then we stack them into a 3D raster and set a suitable color table.
 <code>
 t.rast.mapcalc inputs=NagsHead_99_08 expression="start_time() + 1999" output=NagsHead_years basename=NagsHead_years nprocs=4
 t.rast.to.rast3 input=NagsHead_years output=NagsHead_years
+</code>
+</pre>
 
-# set color table of the space-time cube 3D raster and the second 3D raster
+Now set the color tables of the space-time cube 3D raster and the second 3D raster.
+
+<pre>
+<code>
 r3.colors map=NagsHead_99_08 color=elevation
 r3.colors map=NagsHead_years color=bcyr
 </code>
