@@ -16,6 +16,24 @@ body{
     font-family: arial,sans-serif;
 }
 
+#container
+{
+    position: relative;
+    margin: 0 auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 760px;
+    background-color: white;
+    height:auto !important;
+    min-height:100%;
+    border-style:solid;
+    border-bottom-width:1px;
+    border-top-width:1px;
+    border-left-width:10px;
+    border-right-width:10px;
+    border-color: #DDDDDD;
+}
+
 hr.header {
     height: 3px;
     color: gray;
@@ -120,6 +138,7 @@ div.toc{
     width: 17%;
     font-size: small;
     border-radius: 10px;
+    z-index: 1;
 }
 
 li.toc {
@@ -172,4 +191,8 @@ div.toc:hover {
 
 div.toc {
   background-color: rgba(255, 255, 255, 0.7);
+}
+
+img {
+    max-width: 100%;
 }
