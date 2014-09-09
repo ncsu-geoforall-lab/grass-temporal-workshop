@@ -113,7 +113,7 @@ function parse_code(code, lang) {
                 options: []  // as list of objects {key: string, value: string, quote: string(empty or one of "')}
             }
             
-            module_re = / *[a-z][3]?\.[a-z][a-z\.]*[a-z]/ // / *([a-z][3]?\.[a-z][a-z.]?) /
+            module_re = / *[a-z][3]?\.[a-z3][a-z3\.]*[a-z3]/ // / *([a-z][3]?\.[a-z][a-z.]?) /
             module = module_re.exec(line)
             if (!module)
                 // probably comment or something else
