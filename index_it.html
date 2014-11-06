@@ -132,8 +132,8 @@ da familiarizzare con queste informazioni.
 <pre>
 <code class="neutral">
 g.list type=rast
-g.mlist type=rast pattern="*tempmean"
-g.mlist type=rast pattern="*precip"
+g.list type=rast pattern="*tempmean"
+g.list type=rast pattern="*precip"
 </code>
 </pre>
 
@@ -170,9 +170,9 @@ t.create output=precip_sum type=strds temporaltype=absolute title="Preciptation"
 A questo punto possiamo registrare la serie di mappe all'interno del dataset
 partendo dal 2000-01-01 e usando come intervallo temporale 1 mese.
 Per ottenere l'elenco di tutte le mappe raster che appartengono alla serie,
-usiamo il comando g.mlist creando due liste separate: una per la serie di temperature
+usiamo il comando g.list creando due liste separate: una per la serie di temperature
 e l'altra per i dati di pioggia.
-Da tener presente che il comando g.mlist elenca le mappe in ordine alfabetico, ordine che nel
+Da tener presente che il comando g.list elenca le mappe in ordine alfabetico, ordine che nel
 nostro caso coincide con l'ordine temporale necessario.
 
 <pre>
@@ -181,9 +181,9 @@ nostro caso coincide con l'ordine temporale necessario.
 
 Prima di tutto fare click sul pulsante Pulisci sotto la finestra di Output in fondo al Layer Manager.
 A questo punto elencare tutte le mappe raster contenenti dati di temperatura con il comando
-g.mlist:
+g.list:
 
-    g.mlist type=rast pattern="*tempmean" --quiet
+    g.list type=rast pattern="*tempmean" --quiet
 
 Dopo aver copiato (selezione, pulsante destro del mouse e copia) l'elenco delle mappe, possiamo avviare il comando
 t.register.
@@ -200,7 +200,7 @@ tab Time Date > Selezionare l'opzione <strong>Create an interval</strong>
 La stessa cosa va fatta per i dati di pioggia, ricordandosi di fare click sul pulsante Pulisci in modo
 da eliminare le informazioni precedenti:
 
-    g.mlist type=rast pattern="*precip" --quiet
+    g.list type=rast pattern="*precip" --quiet
 
 Copiare ed incollare il risultato nel campo relativo del comando t.register ed utilizzare i seguenti parametri:
 
@@ -213,14 +213,14 @@ ab Time Date > Selezionare l'opzione <strong>Create an interval</strong>
 </code>
 <code class="bash">
 # prima elenchiamo le mappe per controllare il pattern e l'output
-g.mlist type=rast pattern="*tempmean" separator=comma --quiet
-g.mlist type=rast pattern="*precip" separator=comma --quiet
+g.list type=rast pattern="*tempmean" separator=comma --quiet
+g.list type=rast pattern="*precip" separator=comma --quiet
 
 # quindi usiamo gli apici inversi per passare l'output direttamente a t.register
 t.register -i input=tempmean type=rast start=2000-01-01 increment="1 months" \
-    maps=`g.mlist type=rast pattern="*tempmean" separator=comma --quiet`
+    maps=`g.list type=rast pattern="*tempmean" separator=comma --quiet`
 t.register -i input=precip_sum type=rast start=2000-01-01 increment="1 months" \
-    maps=`g.mlist type=rast pattern="*precip" separator=comma --quiet`
+    maps=`g.list type=rast pattern="*precip" separator=comma --quiet`
 </code>
 </pre>
 
@@ -417,13 +417,13 @@ id|start|end|mean|min|max|mean_of_abs|stddev|variance|coeff_var|sum|null_cells|c
 
 <p>
 Per finire, eliminiamo i due dataset relativi al 2010. Da notare nell'esempio verrà rimosso solamente il contenitore,
-non le mappe attuali, come si può verificare dall'output del comando g.mlists.
+non le mappe attuali, come si può verificare dall'output del comando g.list.
 Usando l'apposita opzione, il modulo t.remove permette di rimuovere anche i dati. Non useremo questa opzione in quanto ancora abbiamo bisogno dei dati.
 <pre>
 <code class="neutral">
 t.remove inputs=tempmean_2010,precip_sum_2010
 t.list type=strds
-g.mlist type=rast pattern="2010*tempmean"
+g.list type=rast pattern="2010*tempmean"
 </code>
 </pre>
 
@@ -518,10 +518,10 @@ dataset di tipo spazio-temporale, ma solo mappe singole.
 
 <pre>
 <code class="gui">
-Eseguiamo g.mlist due volte:
+Eseguiamo g.list due volte:
 
-    g.mlist type=rast pattern="tempmean_F_summer*" separator=comma --q
-    g.mlist type=rast pattern="precip_inch_summer*" separator=comma --q
+    g.list type=rast pattern="tempmean_F_summer*" separator=comma --q
+    g.list type=rast pattern="precip_inch_summer*" separator=comma --q
 
 ed utiliziamo gli output come input per i parametri xseries ed yseries del
 comando r.regression.series invece che i punti:
@@ -529,10 +529,10 @@ comando r.regression.series invece che i punti:
     r.regression.series xseries=... yseries=... output=corr method=corcoef
 </code>
 <code class="bash">
-# using backticks syntax for two g.mlist runs
+# using backticks syntax for two g.list runs
 r.regression.series \
-    xseries=`g.mlist type=rast pattern="tempmean_F_summer*" separator=comma --q` \
-    yseries=`g.mlist type=rast pattern="precip_inch_summer*" separator=comma --q` \
+    xseries=`g.list type=rast pattern="tempmean_F_summer*" separator=comma --q` \
+    yseries=`g.list type=rast pattern="precip_inch_summer*" separator=comma --q` \
     output=corr method=corcoef
 </code>
 </pre>
