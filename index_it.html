@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="highlightjs/styles/default.css">
 <script src="highlightjs/highlight.pack.js"></script>
 
+
 <style>
 .hljs{
     display: none;
@@ -35,6 +36,8 @@
 
 <body>
 
+<div id="container">
+
 <h1>Gestione e visualizzazione di dati spazio-temporali con GRASS GIS</h1>
 <h2 class="notoc">Workshop FOSS4G 2014</h2>
 <p>
@@ -44,10 +47,13 @@ Helena Mitasova,
 Markus Neteler
 </p>
 
-<p>
+
+<p style="border-top-style: solid; border-bottom-style: solid; border-width: 5px; border-color: rgb(130, 130, 130); padding-top: 5px; padding_bottom: 5px;">
   <a href="https://2014.foss4g.org" title="FOSS4G 2014"><img src="foss4g-2014.png" alt="FOSS4G 2014 logo"></a>
   <a href="http://grass.osgeo.org" title="GRASS GIS"><img src="grass-large.png" alt="GRASS GIS logo"></a>
+  <a href="#terrain-time-series-visualization" title="See instructions to create this animation"><img style="width: 150px; padding-left:20px" src="NagsHead.gif" alt="NagsHead DEM animation"></a>
 </p>
+
 
 <p>
 Sommario:
@@ -128,6 +134,7 @@ Avviare GRASS selezionando la location NC_spm_temporal_workshop ed il mapset
 climate_2000_2012. Per prima cosa elencheremo le mappe raster disponibili
 e visualizzeremo le prime mappe contenenti dati di pioggia e temperatura in modo
 da familiarizzare con queste informazioni.
+
 <!-- TODO: things with stdout cannot work with run_command, needs read_command -->
 <pre>
 <code class="neutral">
@@ -153,6 +160,7 @@ d.rast 2000_01_tempmean
 d.legend 2000_01_tempmean
 </code>
 </pre>
+
 <p>
 Per gestiere al meglio la lunga serie di mappe, creeremo un dataset di tipo
 temporale che verrà utilizzato come un contenitore per l'intera serie. Questo
@@ -205,7 +213,7 @@ da eliminare le informazioni precedenti:
 Copiare ed incollare il risultato nel campo relativo del comando t.register ed utilizzare i seguenti parametri:
 
 tab Input > input > <strong>precip_sum</strong>
-ab Time Date > Selezionare l'opzione <strong>Create an interval</strong>
+tab Time Date > Selezionare l'opzione <strong>Create an interval</strong>
               > Valid start date and time of the first map > <strong>2000-01-01</strong>
               > Time increment > <strong>1 months</strong>
 
@@ -296,6 +304,7 @@ t.rast.extract input=tempmean output=tempmean_2010 where="start_time &gt;= '2010
 t.rast.extract input=precip_sum output=precip_sum_2010 where="start_time &gt;= '2010-01-01' and start_time &lt; '2011-01-01'"
 </code>
 </pre>
+
 Verificare l'estensione temporale:
 <pre>
 <code class="gui">
@@ -313,11 +322,10 @@ Creiamo un'animazione per i dati di pioggia relativi al 2010 (come nell'immagine
 <p>
 <img src="./pictures/anim1_result1.png" style="width: 400px;" alt="Result from Animation Tool (one animation)"/>
 <ul>
-
-<li>
-  Avviare lo strumento animazione (Menù Temporal > GUI Tools > Animation tool) ed aggiungere un'animazione 
+<li>Avviare lo strumento animazione (Menù Temporal > GUI Tools > Animation tool) ed aggiungere un'animazione 
   per il dato <code>precip_sum_2010</code> seguendo le istruzioni in <a target="_blank" href="./pictures/anim1.png">questo screenshot</a>.
 </li>
+
 <li>
   Creata l'animazione, cambieremo il formato del tempo per adattarsi al nostro caso: andare nella finestra impostazioni
   e scegliere un formato adatto dal menù a tendina.
@@ -385,6 +393,8 @@ grass.read_command('t.info', input='precip_sum_2010')
 </li>
 </ul>
 
+
+
 <p>
 Ora torniamo indietro al dataset estratto e vediamo alcune altre possibilità per visualizzare i dati con t.rast.list.
 Possiamo, ad esempio, scegliere quali colonne stampare e l'ordine dei dati. In questo caso noi stampiamo start_time e massimo di pioggia ordinandole in maniera crescente.
@@ -392,6 +402,9 @@ Il delimitatore di default (|), può essere cambiato con l'opzione sep.
 
 <pre>
 <code class="neutral">
+t.rast.list input=precip_sum_2010 columns=start_time,max order=max sep=tab
+</code>
+<code class="bash">
 # possiamo scegliere colonne ed ordine
 t.rast.list input=precip_sum_2010 columns=start_time,max order=max sep=tab
 </code>
@@ -441,7 +454,6 @@ t.rast.aggregate input=tempmean output=tempmean_seasonal base=tempmean_seasonal 
 </pre>
 
 <p>
-
 Estrazione del periodo estivo e conversione in gradi Fahrenheit.
 La funzione SQLite <tt>strftime('%m', start_time)</tt> restituisce il mese
 partendo dal timestamp della mappa iniziale.
@@ -469,7 +481,7 @@ Prima di visualizzare le mappe impostiamo la tabella di colori per l'intera seri
 
 <pre>
   <code class="neutral">
-    t.rast.colors input=tempmean_F_summer color=byr
+    t.rast.colors input=tempmean_F_summer color=fahrenheit
   </code>
 </pre>
 
@@ -481,12 +493,10 @@ Dopo aver aggiunto i layer ed averne impostato la trasparenza, verifichiamo che 
 <a target="_blank" href="./pictures/anim_layers.png" >Screenshot instructions are here</a>.
 In aggiunta si può sovrappore una legenda con i valori delle temperature (come visto nelle precedenti
 animazioni).
-
 <p>
 <img src="./pictures/anim2_result.png" alt="animation of summer temperature in North Carolina"/>
 
 <p>
-
 Effettuiamo la stessa aggregazione con il dataset dei dati di piogga, ma in un'altra maniera.
 
 Si aggreghino i dati utilizzando gli intervalli temporali di tempmean_F_summer.
@@ -804,6 +814,12 @@ Per creare il cubo spazio-tempo sovrapporremo verticalmente una serie di modelli
 <pre>
 <code class="neutral">
 t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08
+r3.info -g map=NagsHead_99_08
+g.region rast3d=NagsHead_99_08 -p3
+</code>
+<code class="bash">
+# convertire strds to raster 3D
+t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08
 # verificare l'estensione 3d ed i valori minimi e massimi
 r3.info -g map=NagsHead_99_08
 # impostare la regione a questo raster così da usarla per le successive elaborazioni
@@ -820,8 +836,13 @@ in un raster 3D ed associamo una tabella dei colori adatta.
 <code>
 t.rast.mapcalc inputs=NagsHead_99_08 expression="start_time() + 1999" output=NagsHead_years basename=NagsHead_years nprocs=4
 t.rast.to.rast3 input=NagsHead_years output=NagsHead_years
+</code>
+</pre>
 
-# set color table of the space-time cube 3D raster and the second 3D raster
+Ora impostare la tabella dei colore del cubo spazio-tempo e il secondo raster 3D
+
+<pre>
+<code>
 r3.colors map=NagsHead_99_08 color=elevation
 r3.colors map=NagsHead_years color=bcyr
 </code>
@@ -829,29 +850,23 @@ r3.colors map=NagsHead_years color=bcyr
 
 <p>
 Ora visualiziamo il cubo spazio-tempo in 3D. Seguiamo le istruzioni seguenti:
-Now we will display the space-time cube in 3D. Follow the instructions below:
-<pre>
-<code class="gui">
-# abbassare la risoluzione per visualizzare il rendering
-g.region -p3 res3=3 tbres=1
-
-
-# prima aggiungiamo alla vista 3D il DEM del 2008 che è stato diviso per 20 per finalità di visualizzazione
-# perchè noi dobbiamo usare una grande esagerazion verticale per il raster 3D
-
-
-Add raster map layer -> select NH_2008_1m_0.05
-Add various raster map layers -> Add 3D raster map layer -> select NagsHead_99_08
-Right click on 3D raster -> Zoom to selected map
-Incollare il comando d.legend nella console della GUI:
-d.legend -f rast3d=NagsHead_years at=5,50,7,10 use=1999,2000,2001,2002,2003,2004,2005,2006,2007,2008
-Switch to 3D view (be patient)
-On View page, set z-exaggeration to 20 and view height to 100.
-On Data page -> Surface, lower fine mode resolution to 1
-On Data page -> Volume, add isosurface e quindi cambiare il valore a 11 o simili e cambiare il colore
-per utilizzare NagsHead_years. Impostare la risoluzione della superficie iso a 1.
-</code>
-</pre>
+<ol>
+<li>Rimuovere tutte le mappe nel Layer Manager.</li>
+<li>Aggiungere il modello digitale dell'elevazione 2008 (<tt>NH_2008_1m_0.05</tt>) che è stato diviso per 20 per la visualizzazione in 3D perchè dobbiamo usare una grande exaggeration per il raster 3D (Add raster map layer -> select <tt>NH_2008_1m_0.05</tt>)</li>
+<li>Aggiungere il raster 3D <tt>NagsHead_99_08</tt> (Add various raster map layers -> Add 3D raster map layer -> select <tt>NagsHead_99_08</tt>).</li>
+<li>Cliccare sul raster 3D -> Zoom to selected map.</li>
+<li>Incollare il comando d.legend nella console dei comandi della GUI:
+<pre><code class="neutral">d.legend -f rast3d=NagsHead_years at=5,50,7,10 use=1999,2000,2001,2002,2003,2004,2005,2006,2007,2008</code></pre>
+</li>
+<li>Imposta la risoluzione più bassa per velocizzare la visualizzazione 3D:
+<pre><code>g.region -p3 res3=3 tbres=1</code></pre></li>
+<li>Cambia la visualizzazione a quella 3D (aspettate).</li>
+<li>Nella pagina View , impostare z-exaggeration a 20 e view height a 100.</li>
+<li>Nella pagina Data -> Surface, lower fine mode resolution a 1.</li>
+<li>Nella pagina Data -> Volume, aggiungere isosurface e quindi cambiare i suoi valori a 11 o similari e cambiare il colore impostando quello della mappa NagsHead_years.</li>
+<li>Impostare la risoluzione della isosurface a 1.</li>
+<li>Potete alternare la direzione normale della isosurface o cambiare la luce nella pagina Appearance -> Light per ottenere un risultato migliore.</li>
+</ol>
 
 <p>
 <img src="./pictures/nags_head_nviz.png" alt="NagsHead space-time cube in wxNviz" style="width: 700px;"/>
@@ -944,8 +959,14 @@ Da notare che l'animazione 3D non è supportata in MS Windows.
   Spatio-temporal data handling and visualization in GRASS GIS workshop for FOSS4G 2014
   by Vaclav Petras, Anna Petrasova, Helena Mitasova and Markus Neteler
   is licensed under&nbsp;a&nbsp;<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+  <br />
   Versione Italiana di Luca Casagrande
+
+
 </p>
   <script src="codetabs.js"></script>
+
+</div>
+
 </body>
 </html>
