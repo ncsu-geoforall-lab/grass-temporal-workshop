@@ -74,7 +74,7 @@ Software:
 
 <p>
 Data:
-<ul>
+<ul  class="justify">
 <li>location <a href="./NC_spm_temporal_workshop.zip">NC_spm_temporal workshop</a>
 <ul>
 <li>mapset <code>climate_2000_2012</code>: serie di temperature e piogge per l'intero North Carolina</li>
@@ -90,7 +90,7 @@ Data:
 <p>
 Terminologia:
 
-<ul>
+<ul class="justify">
 <li>
   In GRASS, una mappa  descrive un fenomeno spaziale e viene archiviata all'interno di un database GRASS;
   può essere di tipo raster, vettoriale oppure raster 3D (in altri applicativi GIS spesso si usa il termine layer).
@@ -118,7 +118,7 @@ Terminologia:
 </ul>
 <p>
 Note:
-<ul>
+<ul class="justify">
 <li>
   Per eseguire un comando all'interno della GUI inserire i parametri necessari oppure
   inserirli nella console presente nella GUI e premere invio.
@@ -321,7 +321,7 @@ g.gui.timeline inputs=tempmean,precip_sum,tempmean_2010,precip_sum_2010
 Creiamo un'animazione per i dati di pioggia relativi al 2010 (come nell'immagine):
 <p>
 <img src="./pictures/anim1_result1.png" style="width: 400px;" alt="Result from Animation Tool (one animation)"/>
-<ul>
+<ul class="justify">
 <li>Avviare lo strumento animazione (Menù Temporal > GUI Tools > Animation tool) ed aggiungere un'animazione 
   per il dato <code>precip_sum_2010</code> seguendo le istruzioni in <a target="_blank" href="./pictures/anim1.png">questo screenshot</a>.
 </li>
@@ -485,6 +485,7 @@ Prima di visualizzare le mappe impostiamo la tabella di colori per l'intera seri
   </code>
 </pre>
 
+<p>
 Avvia lo strumento Animazione e seleziona nuva animazione. Questa volta aggiungeremo più layers:
 una serie temporale di temperature <tt>tempmean_F_summer</tt>, una mappa statica contenente i limiti 
 amministrativi <tt>boundary_county</tt> e una mappa raster statica in semi trasparenza (shaded relief)
@@ -626,7 +627,7 @@ t.vect.observe.strds input=towns strds=tempmean_F_summer output=towns_tempmean_s
 </pre>
 
 <p>
-Now we list temperature values:
+Ora visualiziamo i valori di temperatura:
 
 <pre>
 <code class="gui">
@@ -658,10 +659,12 @@ plt.show()
 
 <h2 id="nagshead-series">Serie di Nags Head</h2>
 
+<p>
 Si avvi grass7 con la location NC_spm_temporal_workshop ed il mapset NaghHead_series.
 
 <h3>Registrazione e visualizzazione delle serie temporali</h3>
 
+<p>
 Prima creiamo un dataset raster spazio-temporale vuoto. Utilizzeremo intervalli di tempo relativi e l'anno come unità.
 
 <pre>
@@ -850,7 +853,7 @@ r3.colors map=NagsHead_years color=bcyr
 
 <p>
 Ora visualiziamo il cubo spazio-tempo in 3D. Seguiamo le istruzioni seguenti:
-<ol>
+<ol class="justify">
 <li>Rimuovere tutte le mappe nel Layer Manager.</li>
 <li>Aggiungere il modello digitale dell'elevazione 2008 (<tt>NH_2008_1m_0.05</tt>) che è stato diviso per 20 per la visualizzazione in 3D perchè dobbiamo usare una grande exaggeration per il raster 3D (Add raster map layer -> select <tt>NH_2008_1m_0.05</tt>)</li>
 <li>Aggiungere il raster 3D <tt>NagsHead_99_08</tt> (Add various raster map layers -> Add 3D raster map layer -> select <tt>NagsHead_99_08</tt>).</li>
