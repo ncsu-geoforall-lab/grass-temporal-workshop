@@ -41,6 +41,14 @@ hr.header {
     width: 100%;
 }
 
+p {
+  text-align: justify;
+}
+
+.justify {
+  text-align: justify;
+}
+
 h1{
     background-color: transparent;
     color: rgb(25%, 60%, 25%);
