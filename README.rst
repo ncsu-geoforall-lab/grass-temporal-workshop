@@ -7,7 +7,7 @@ was created for FOSS4G 2014 conference in Portland, Oregon.
 Online version
 --------------
 
-* http://fatra.cnr.ncsu.edu/temporal-grass-workshop/
+* http://ncsu-osgeorel.github.io/grass-temporal-workshop/
 
 Additional files
 ----------------
