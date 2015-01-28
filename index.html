@@ -1,0 +1,967 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Spatio-temporal data handling and visualization in GRASS GIS</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="shortcut icon" href="grass.png">
+
+  <script src="jquery.js"></script>
+
+<!--
+<link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/default.min.css">
+<script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+-->
+
+<link rel="stylesheet" href="highlightjs/styles/default.css">
+<script src="highlightjs/highlight.pack.js"></script>
+
+
+<style>
+.hljs{
+    display: none;
+    /*padding: 0em;*/
+}
+
+</style>
+
+
+  <link rel="stylesheet" href="grassdocs.css">
+  <link rel="stylesheet" href="codetabs.css">
+
+</head>
+
+<body>
+
+<div id="container">
+
+<h1>Spatio-temporal data handling and visualization in GRASS GIS</h1>
+<h2 class="notoc">FOSS4G 2014 workshop</h2>
+<p>
+Vaclav Petras,
+Anna Petrasova,
+Helena Mitasova,
+Markus Neteler
+</p>
+
+
+<p style="border-top-style: solid; border-bottom-style: solid; border-width: 5px; border-color: rgb(130, 130, 130); padding-top: 5px; padding_bottom: 5px;">
+  <a href="https://2014.foss4g.org" title="FOSS4G 2014"><img src="foss4g-2014.png" alt="FOSS4G 2014 logo"></a>
+  <a href="http://grass.osgeo.org" title="GRASS GIS"><img src="grass-large.png" alt="GRASS GIS logo"></a>
+  <a href="#terrain-time-series-visualization" title="See instructions to create this animation"><img style="width: 150px; padding-left:20px" src="NagsHead.gif" alt="NagsHead DEM animation"></a>
+</p>
+
+
+<p>
+Workshop URL:
+<ul><li><a href="http://fatra.cnr.ncsu.edu/temporal-grass-workshop/">http://fatra.cnr.ncsu.edu/temporal-grass-workshop/</a></li>
+</ul>
+
+<p>
+Outline:
+<ul>
+<li> Quick <a href="./GRASS_intro.pdf">introduction to GRASS GIS</a> and <a href="./TGRASS_intro.pdf">GRASS Temporal Framework</a></li>
+<li> <a href="#climate-data-analysis">Climate data analysis</a>: analyze and visualize North Carolina temperature and precipitation time series
+<li> <a href="#terrain-time-series-visualization">Terrain time series visualization</a>: process Nags Head coastal terrain time series and visualize space-time cube
+<li> <a href="#visualization-of-solar-radiation">Visualization of solar radiation</a>: compute and visualize solar radiation dynamics using NC State Centennial Campus lidar data
+</ul>
+
+<p>
+Software:
+<ul>
+<li>GRASS GIS 7 (includes GRASS GIS Temporal Framework [1])</li>
+<li>matplotlib with pyplot
+(included in GRASS installation for MS Windows; package python-matplotlib for Ubuntu)</li>
+</ul>
+
+<p>
+Data:
+<ul>
+<li>location <a href="./NC_spm_temporal_workshop.zip">NC_spm_temporal workshop</a>
+<ul>
+<li>mapset <code>climate_2000_2012</code>: temperature and precipitation series for the whole North Carolina [2]</li>
+<li>mapset <code>NagsHead_series</code>: elevation data time series, derived from lidar data</li>
+<li>mapset <code>centennial</code>: DEM of part of Centennial campus, NC State University, derived from lidar data</li>
+</ul>
+</ul>
+
+<p>
+Terminology:
+<ul>
+<li>map in GRASS describes a spatial phenomenon, map is stored in GRASS database,
+  it can be raster, vector, or 3D raster (other GIS systems often call this a layer)</li>
+<!--
+<li>raster map usually describes a continuous spatial phenomena, examples include precipitation and aerial image</li>
+<li>vector map usually describes a discrete spatial phenomena, for example meteorological stations</li>
+-->
+<li>3D raster is a three dimensional raster, alternative names include voxel, voxel model and volume</li>
+<li>spatio-temporal dataset in GRASS is a set of GRASS maps registered in GRASS temporal database</li>
+<li>
+  GRASS module is one function, procedure or algorithm,
+  it can be also referred as command especially when also all parameters are given
+  (other systems use also terms tool and program),
+  module can be invoked from GUI, Python or system command line
+</li>
+<li>GUI is a graphical user interface, i.e. the windows which user usually sees after starting GRASS GIS
+  (GUI in GRASS GIS is often referred as wxGUI because of the underlying technology)</li>
+</ul>
+
+<p>
+Notes:
+<ul>
+<li>To run commands in GUI, fill the module
+  parameters into a proper form or just type the relevant command
+  into the command console in GUI and press enter.</li>
+</ul>
+
+
+<h2>Climate data analysis</h2>
+
+<h3>Basic commands and visualizations</h3>
+<p>
+Start GRASS with location NC_spm_temporal_workshop and mapset climate_2000_2012.
+First we list available raster maps and display the first temperature
+and precipitation maps from the series to make ourselves familiar with the data.
+
+<!-- TODO: things with stdout cannot work with run_command, needs read_command -->
+<pre>
+<code class="neutral">
+g.list type=raster
+g.list type=raster pattern="*tempmean"
+g.list type=raster pattern="*precip"
+</code>
+</pre>
+
+<pre>
+<code class="gui">
+In Layer Manager menu: File -> Map display -> Add raster (also available on toolbar)
+Select raster map '2000_01_tempmean'
+Display legend
+
+<img style="width: 600px;" src="pictures/scr_legend.png" alt="display precipitation map and legend" title="display precipitation map and legend">
+</code>
+<code class="bash">
+# start monitor
+d.mon wx0
+# display raster maps
+d.rast 2000_01_tempmean
+d.legend 2000_01_tempmean
+</code>
+</pre>
+
+To better handle the long time series of maps, we create temporal datasets
+which serve as containers for the time series and we will further manipulate
+them instead of the individual maps. First, we create empty datasets of type
+strds (space-time raster dataset). Note, that we use absolute time.
+<!-- TODO: explain what is temporal dataset "think about container", the type is strds STRDS-->
+
+<pre>
+<code>
+t.create output=tempmean type=strds temporaltype=absolute title="Average temperature" description="Monthly temperature average in NC [deg C]"
+t.create output=precip_sum type=strds temporaltype=absolute title="Preciptation" description="Monthly precipitation sums in NC [mm]"
+</code>
+</pre>
+
+<p>
+Now we register raster maps into yet empty space-time raster datasets
+with start date 2000-01-01 and interval time with increment 1 month. 
+We use g.list again to list separately temperature and precipitation maps.
+Note that g.list lists maps alphabetically which in this case orders the maps
+chronologically which is what we need.
+
+<pre>
+<code class="gui">
+<img style="width: 700px;" src="pictures/tregister.png" alt="t register dialog filled" title="t register dialog with filled values">
+
+First click on Clear button under Output window label at the bottom of Layer Manager
+List temperature raster maps with g.list:
+
+    g.list type=raster pattern="*tempmean" --quiet
+
+Then launch t.register and copy and paste output of g.list to file parameter of t.register
+(input field under 'or enter values interactively'). In t.register dialog, set additional values:
+
+tab Input > input > <strong>tempmean</strong>
+tab Time Date > start > <strong>2000-01-01</strong>
+              > increment > <strong>1 months</strong>
+              > check <strong>i</strong> flag
+
+Do the same for precipitation, first click on Clear button again to clear the previous list to simplify copying:
+
+    g.list type=raster pattern="*precip" --quiet
+
+And than copy and paste output to the appropriate field in t.register and use parameters:
+
+tab Input > input > <strong>precip_sum</strong>
+tab Time Date > start > <strong>2000-01-01</strong>
+              > increment > <strong>1 months</strong>
+              > check <strong>i</strong> flag
+
+</code>
+<code class="bash">
+# first list maps to check the pattern and output
+g.list type=raster pattern="*tempmean" separator=comma --quiet
+g.list type=raster pattern="*precip" separator=comma --quiet
+
+# then use backticks to pass the maps directly to t.register
+t.register -i input=tempmean type=raster start=2000-01-01 increment="1 months" \
+    maps=`g.list type=raster pattern="*tempmean" separator=comma --quiet`
+t.register -i input=precip_sum type=raster start=2000-01-01 increment="1 months" \
+    maps=`g.list type=raster pattern="*precip" separator=comma --quiet`
+</code>
+</pre>
+
+<p>
+Make sure the datasets are created and populated correctly:
+<pre>
+<code class="neutral">
+t.list type=strds
+t.rast.list input=tempmean sep=tab
+</code>
+</pre>
+
+<p>
+Since the result of t.rast.list is easily parseable but not so easy to read by humans,
+we will visualize the temporal extents of the dataset:
+
+<pre>
+<code class="gui">
+Menu: Temporal -> GUI tools -> Timeline tool
+Select dataset tempmean
+</code>
+<code class="bash">
+g.gui.timeline tempmean
+</code>
+</pre>
+<img src="./pictures/timeline_tempmean.png" alt="plot of temporal extents of tempmean strds"
+title="Plot of temporal extents of space-time raster dataset tempmean"/>
+
+
+<!--
+<p>
+Another example of listing maps of our registered dataset,
+this time we list maps with temporal resolution (granularity) 2 years:
+
+<pre>
+<code>
+t.rast.list input=tempmean method=gran granule="2 years" sep=tab
+</code>
+</pre>
+<pre>
+<samp>
+id	name	mapset	start_time	end_time	interval_length	distance_from_begin
+2000_01_tempmean@climate_2000_2012	2000_01_tempmean	climate_2000_2012	2000-01-01 00:00:00	2002-01-01 00:00:00	731.0	0.0
+2002_01_tempmean@climate_2000_2012	2002_01_tempmean	climate_2000_2012	2002-01-01 00:00:00	2004-01-01 00:00:00	730.0	731.0
+2004_01_tempmean@climate_2000_2012	2004_01_tempmean	climate_2000_2012	2004-01-01 00:00:00	2006-01-01 00:00:00	731.0	1461.0
+2006_01_tempmean@climate_2000_2012	2006_01_tempmean	climate_2000_2012	2006-01-01 00:00:00	2008-01-01 00:00:00	730.0	2192.0
+2008_01_tempmean@climate_2000_2012	2008_01_tempmean	climate_2000_2012	2008-01-01 00:00:00	2010-01-01 00:00:00	731.0	2922.0
+2010_01_tempmean@climate_2000_2012	2010_01_tempmean	climate_2000_2012	2010-01-01 00:00:00	2012-01-01 00:00:00	730.0	3653.0
+2012_01_tempmean@climate_2000_2012	2012_01_tempmean	climate_2000_2012	2012-01-01 00:00:00	2014-01-01 00:00:00	731.0	4383.0
+</samp>
+</pre>
+-->
+
+<!--
+comment this out if necessary
+
+<p>
+Query space-time raster dataset in a point and display the values in a plot
+(available only in the newest GRASS GIS 7 version).
+<pre>
+<code>
+g.gui.tplot inputs=precip_sum coordinates=366165,218084
+</code>
+</pre>
+<img src="./pictures/tplot_precip_sum.png" alt="plot of values from certain coordinate"/>
+-->
+<p>
+Now we are going to animate part of the dataset. We will first extract year 2010 from both space-time raster datasets.
+In this case, no new maps are created, the newly created dataset just points to the old maps.
+<pre>
+<code>
+t.rast.extract input=tempmean output=tempmean_2010 where="start_time &gt;= '2010-01-01' and start_time &lt; '2011-01-01'"
+t.rast.extract input=precip_sum output=precip_sum_2010 where="start_time &gt;= '2010-01-01' and start_time &lt; '2011-01-01'"
+</code>
+</pre>
+
+Look at the temporal extents:
+<pre>
+<code class="gui">
+Menu: Temporal -> GUI tools -> Timeline tool
+Select datasets tempmean, precip_sum, tempmean_2010, precip_sum_2010
+</code>
+<code class="bash">
+g.gui.timeline inputs=tempmean,precip_sum,tempmean_2010,precip_sum_2010
+</code>
+</pre>
+<img src="./pictures/timeline_extracted.png" alt="extracted datasets"/>
+
+<p>
+Create an animation of precipitation in 2010 (as in the picture) by following these steps:
+<p>
+<img src="./pictures/anim1_result1.png" style="width: 400px;" alt="Result from Animation Tool (one animation)"/>
+<ul>
+<li>Run Animation tool (in menu find Temporal > GUI tools > Animation tool) 
+and add animation using these screenshot instructions for <code>precip_sum_2010</code> (click on the picture to enlarge).<br>
+
+<a target="_blank" href="./pictures/anim1.png">
+<img src="./pictures/anim1.png" alt="screenshot instructions"
+style="width: 600px"/></a>
+</li>
+<li> When the animation is done, we can change the time format to better
+suit our case: go to Settings dialog (accessible from toolbar) and choose a suitable format from the drop-down list.</li>
+<li>To display legend, we first have to get minimum and maximum values of the entire dataset.
+We get these values by running t.info. Then, in the 'Edit animation' dialog, check legend,
+set option 'rast' to one of the maps of the dataset,
+and set 'range' option to the min and max values got from t.info (in the format min,max).
+<pre>
+<code class="neutral">
+t.info precip_sum_2010
+</code>
+<code class="bash">
+t.info precip_sum_2010
+</code>
+<code class="python">
+grass.read_command('t.info', input='precip_sum_2010')
+</code>
+</pre>
+<pre>
+<samp>
++-------------------- Space Time Raster Dataset -----------------------------+
+|                                                                            |
++-------------------- Basic information -------------------------------------+
+| ...
++-------------------- Absolute time -----------------------------------------+
+| ..
++-------------------- Spatial extent ----------------------------------------+
+| ...
++-------------------- Metadata information --------------------------------+
+| Raster register table:...... raster_map_register_89c7821c3f174f3e965f481dfbd0c8d7
+| North-South resolution min:. 500.0
+| North-South resolution max:. 500.0
+| East-west resolution min:... 500.0
+| East-west resolution max:... 500.0
+| Minimum value min:.......... 6.275055
+| Minimum value max:.......... 84.408674
+| Maximum value min:.......... 185.205301
+| Maximum value max:.......... 436.309366
+| Aggregation type:........... None
+| Number of registered maps:.. 12
+| ...
+</samp>
+</pre>
+</li>
+
+<li>Change color table if desired (to built-in color table precipitaton_monthly or create your own color table). Also change the color of the temperature dataset which will be used in the next step.
+To see the change in the animation tool, click on Render map in the toolbar which reloads all maps.
+<pre>
+<code>
+t.rast.colors input=precip_sum_2010 color=precipitation_monthly
+t.rast.colors input=tempmean_2010 color=celsius
+</code>
+</pre>
+
+<li>And now add a second animation with <code>tempmean_2010</code> so that we can see the temperature
+and precipitation synchronized. Use the same <a href="./pictures/anim1.png">screenshot instructions</a> as before,
+just use <code>tempmean_2010</code> instead of <code>precip_sum_2010</code>.
+<p>
+<img src="./pictures/anim1_result.png" style="width: 600px;" alt="Result from Animation Tool (two animations)"/>
+</li>
+</ul>
+
+
+
+<p>
+Now we go back to the extracted dataset and look at some other options
+to explore data using again t.rast.list. We can for example choose which columns to print, and the order of records.
+In this case we print the time and monthly minimum of precipitation to get the information
+which months in 2010 had the highest maximum values.
+The default separator (pipe) can be changed with separator option.
+
+<pre>
+<code class="neutral">
+t.rast.list input=precip_sum_2010 columns=start_time,max order=max sep=tab
+</code>
+<code class="bash">
+# we can choose different columns and order
+t.rast.list input=precip_sum_2010 columns=start_time,max order=max sep=tab
+</code>
+</pre>
+
+<p>
+Here we compute univariate statistics using t.rast.univar with temporal 'where' option
+to limit output to last 3 months of the year 2010.
+<pre>
+<code class="neutral">
+t.rast.univar input=tempmean_2010 where="start_time &gt; '2010-10-01'"
+</code>
+</pre>
+<pre>
+<samp>
+id|start|end|mean|min|max|mean_of_abs|stddev|variance|coeff_var|sum|null_cells|cells
+2010_10_tempmean@climate_2000_2012|2010-10-01 00:00:00|2010-11-01 00:00:00|16.2275459748922|9.80648888481988|19.2237726847331|16.2275459748922|1.83784116074554|3.37766013213051|11.3254410962021|8233321.31864314|503233|1010600
+2010_11_tempmean@climate_2000_2012|2010-11-01 00:00:00|2010-12-01 00:00:00|10.0550104277932|3.83957968817817|13.2355732387967|10.0550104277932|1.49157983140112|2.2248103934426|14.8341947739629|5101580.47571814|503233|1010600
+2010_12_tempmean@climate_2000_2012|2010-12-01 00:00:00|2011-01-01 00:00:00|0.929180131463252|-6.46433724297418|4.24769083658854|1.58153627012032|1.56125262006063|2.43750974364618|168.024752918684|471435.335760116|503233|1010600
+</samp>
+</pre>
+
+
+<p>
+Finally we remove these two extracted spatio-temporal datasets. Note: in this case we remove just the "container",
+not the actual maps, as we can see from the output of g.list.
+Module t.remove enables to remove the actual data, too,
+using appropriate flags, but we will not do that now, since we still need the data.
+<pre>
+<code class="neutral">
+t.remove inputs=tempmean_2010,precip_sum_2010
+t.list type=strds
+g.list type=raster pattern="2010*tempmean"
+</code>
+</pre>
+
+
+
+<h3>Temporal aggregation</h3>
+
+<p>
+We will start by computing average temperature for each season of the year (we use term aggregation).
+We specify 'where' option to start aggregating the first of March 2000 because winter season 2000 is not complete.
+
+<pre>
+<code>
+t.rast.aggregate input=tempmean output=tempmean_seasonal base=tempmean_seasonal granularity="3 months" method=average where="start_time &gt;= '2000-03-01' and start_time &lt; '2012-11-01'"
+</code>
+</pre>
+
+<p>
+Extract summer periods and convert to degrees Fahrenheit.
+SQLite function <tt>strftime('%m', start_time)</tt> returns the month of
+the map start timestamp.
+Note that <tt>strftime</tt> function is not a GRASS function.
+It is specific to SQLite (temporal database) backend,
+you need to use something different if you are using PostgreSQL backend.
+Using nprocs=4 we are telling t.rast.extract to use 4 processes which will be
+distributed to 4 processor cores if available.
+
+<pre>
+<code>
+t.rast.extract input=tempmean_seasonal where="strftime('%m', start_time)='06'" expression="(tempmean_seasonal  * 9.0/5.0) + 32" output=tempmean_F_summer base=tempmean_F_summer nprocs=4
+</code>
+</pre>
+<img src="./pictures/timeline_tempmean_seasonal.png" alt="temporal extents of tempmean_seasonal"/>
+
+<p>
+Now we will display an animation of summer temperatures in North Carolina
+and we will overlay static vector map of counties' boundaries and semi-transparent shaded relief.
+
+Before we display the maps, we set color table of the entire time series. 
+
+<pre><code class="neutral">
+t.rast.colors input=tempmean_F_summer color=fahrenheit
+</code></pre>
+
+Launch Animation tool, add new animation. We will this time add more layers,
+one time-series of temperatures <tt>tempmean_F_summer</tt>, one static vector map of boundaries <tt>boundary_county</tt>
+and one static semi-transparent raster map (shaded relief) <tt>shaded_state_500m</tt>.
+The vector and raster maps are located in mapset PERMANENT. After adding maps and setting opacity,
+make sure the layers are in the right order. <a target="_blank" href="./pictures/anim_layers.png" >Screenshot instructions are here</a>.
+Also, you can add legend (similarly as in previous animations) for temperature values.
+<p>
+<img src="./pictures/anim2_result.png" alt="animation of summer temperature in North Carolina"/>
+
+<p>
+Let's do the same aggregation with precipitation dataset in a different way.
+Aggregate data using time intervals of tempmean_F_summer.
+Convert millimeters to inches. The result will be mean of summer monthly precipitation in inches.
+
+<pre>
+<code>
+t.rast.aggregate.ds input=precip_sum sample=tempmean_F_summer output=precip_summer base=precip_summer method=average
+t.rast.mapcalc inputs=precip_summer expression="precip_summer / 25.4" output=precip_inch_summer base=precip_inch_summer nprocs=4
+</code>
+</pre>
+
+<h3>Is precipitation and temperature correlated?</h3>
+<p>
+
+We will use r.regression.series, which is a GRASS addon. If you don't have it installed,
+use g.extension to download it from GRASS Addons:
+
+<pre>
+<code class="neutral">
+g.extension extension=r.regression.series
+</code>
+</pre>
+
+<p>
+Now we determine the correlation. Note that r.regression.series does not accept 
+spatio-temporal datasets yet, just individual maps:
+
+<pre>
+<code class="gui">
+Run g.list two times: 
+
+    g.list type=raster pattern="tempmean_F_summer*" separator=comma --q
+    g.list type=raster pattern="precip_inch_summer*" separator=comma --q
+
+and then use the outputs as inputs to xseries and yseries parameters of
+the r.regression.series module instead of the dots:
+
+    r.regression.series xseries=... yseries=... output=corr method=corcoef
+</code>
+<code class="bash">
+# using backticks syntax for two g.list runs
+r.regression.series \
+    xseries=`g.list type=raster pattern="tempmean_F_summer*" separator=comma --q` \
+    yseries=`g.list type=raster pattern="precip_inch_summer*" separator=comma --q` \
+    output=corr method=corcoef
+</code>
+</pre>
+
+<p>
+Set color table of <code>corr</code> raster map to differences color table.
+<pre>
+<code>
+r.colors map=corr color=differences
+</code>
+</pre>
+
+<p>
+Now we can explore the map <code>corr</code> showing mostly negative
+spatial correlation between temperature and precipitation during summer.
+<pre>
+<code class="gui">
+Add raster map layer -> select corr
+Add map elements -> Show/hide legend
+</code>
+<code class="bash">
+# display raster maps
+d.rast corr
+d.legend corr
+</code>
+</pre>
+<img src="./pictures/corr.png" alt="temperature and precipitation spatially correlated"/>
+
+
+<h3>Plot min/max values of summer temperature and precipitation</h3>
+
+<p>
+Show plot of min and max values of summer periods.
+We will first create a file with those values. To simplify things,
+paste the following command into terminal (not the GUI command console, that wouldn't work).
+
+<pre>
+<code class="bash">
+# this will create file in the current directory
+t.rast.list input=tempmean_F_summer columns=start_time,min,max separator=comma > temperatures.txt
+</code>
+<code class="gui">
+Run t.rast.list with following parameters:
+
+tab Required > input > tempmean_F_summer
+tab Formatting > separator > comma
+tab Selection > columns > start_time,min,max
+
+Copy output to a file named temperatures.txt.
+Note that you will need full path to the file in the next step.
+Note that some editors add txt extension even when you specify it
+resulting in two txt extensions which may not be visible in some file browsers
+(this is mainly problem on MS Windows).
+</code>
+</pre>
+
+<p>
+Now go to Python shell tab in the wxGUI and copy and paste and execute
+(row by row):
+
+<pre>
+<code class="python">
+# remember to use the full path to the file if necessary
+import matplotlib.pyplot as plt
+plt.plotfile("temperatures.txt", cols=(0,1,2), delimiter=',', subplots=False)
+plt.show()
+</code>
+</pre>
+
+<img src="./pictures/plot_summer_minmax.png" alt="minimum and maximum temperatures in summer"/>
+
+<h3>Plot temperatures in Raleigh and Ashville</h3>
+<p>
+Now we will plot temperatures in Raleigh and Ashville. You can find vector map <tt>towns</tt> in mapset PERMANENT.
+It contains 2 points representing Raleigh and Ashville.
+Using t.vect.observe.strds, we create a space-time vector dataset
+with values of summer temperature in those two locations stored in the attribute tables:
+
+<pre>
+<code>
+t.vect.observe.strds input=towns strds=tempmean_F_summer output=towns_tempmean_summer vector_output=towns_summer column=tempmean
+</code>
+</pre>
+
+<p>
+Now we list temperature values:
+
+<pre>
+<code class="gui">
+Run t.vect.db.select and get values for Raleigh. Save the result into a text file and name it raleigh.txt:
+    t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 1"
+
+Then get values for Asheville and again save the result into file asheville.txt:
+    t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 2"
+</code>
+<code class="bash">
+t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 1" > raleigh.txt
+t.vect.db.select input=towns_tempmean_summer columns=tempmean separator=comma where="cat = 2" > asheville.txt
+</code>
+</pre>
+
+<p>
+Plot the values using matplotlib in GUI in Python console
+(note that this is just basic plotting to avoid more complicated code):
+<pre>
+<code class="python">
+import matplotlib.pyplot as plt
+plt.plotfile("raleigh.txt", cols=(0,2), delimiter=',', subplots=False)
+plt.plotfile("asheville.txt", cols=(0,2), delimiter=',', subplots=False, newfig=False)
+plt.show()
+</code>
+</pre>
+<img src="./pictures/plot_summer_towns.png" alt="plot of summer temperatures in two towns"/>
+
+
+<h2>Terrain time series visualization</h2>
+
+Start grass7 with location NC_spm_temporal_workshop and mapset NaghHead_series.
+
+<h3>Time series registration and visualization</h3>
+
+First, we create an empty space-time raster dataset. We will use relative time with years as units.
+
+<pre>
+<code>
+t.create output=NagsHead_99_08 type=strds temporaltype=relative title="Nags Head elevation series" description="from 1999 to 2008 with gaps"
+</code>
+</pre>
+
+<!--
+<p>
+Check whether it was successfull:
+<pre>
+<code>
+t.list type=strds
+</code>
+</pre>
+-->
+<p>
+Register maps in the dataset using the list of maps bellow.
+Each map has an associated year. The default separator is a pipe.
+
+<pre>
+<code class="gui">
+In t.register dialog, use an interactive input box for the file option and
+copy and paste the list of the maps:
+NH_1999_1m|1999
+NH_2001_1m|2001
+NH_2004_1m|2004
+NH_2005_1m|2005
+NH_2007_1m|2007
+NH_2008_1m|2008
+
+Also, use the other options bellow:
+
+tab Input > input > NagsHead_99_08
+tab Time Date > unit > years
+</code>
+<code class="bash">
+echo "NH_1999_1m|1999
+      NH_2001_1m|2001
+      NH_2004_1m|2004
+      NH_2005_1m|2005
+      NH_2007_1m|2007
+      NH_2008_1m|2008" > NH.txt
+t.register input=NagsHead_99_08 type=raster file=NH.txt unit=years
+</code>
+</pre>
+
+<p>
+By displaying temporal extents of the newly created dataset with Timeline tool,
+we can see that each map is registered as an instance (not interval) and there are time gaps in the dataset.
+<p>
+<img src="./pictures/timeline_nagshead_gaps.png" alt="temporal extents of NagsHead dataset"/>
+
+
+<p>
+Since there are gaps in the dataset, we decided to interpolate missing data.
+The interpolated maps are <em>already in the mapset</em> so we will skip this step now.
+(The maps were linearly interpolated with r.series.interp. For interval data,
+you could use t.rast.gapfill.)
+<!--
+<pre>
+<code>
+g.region raster=NH_1999_1m -p
+r.series.interp input=NH_1999_1m,NH_2001_1m,NH_2004_1m,NH_2005_1m,NH_2007_1m,NH_2008_1m datapos=1999,2001,2004,2005,2007,2008 output=NH_2000_1m_interp,NH_2002_1m_interp,NH_2003_1m_interp,NH_2006_1m_interp sampl=2000,2002,2003,2006
+</code>
+</pre>
+-->
+<p>
+We still have to register interpolated maps to the existing dataset.
+
+<pre>
+<code class="gui">
+Use interactive input for the file option in the dialog of t.register
+module. Use parameters input > NagsHead_99_08 and unit > years.
+Here is the list of maps to be registered including the time stamps:
+
+NH_2000_1m_interp|2000
+NH_2002_1m_interp|2002
+NH_2003_1m_interp|2003
+NH_2006_1m_interp|2006
+</code>
+<code class="bash">
+echo "NH_2000_1m_interp|2000
+      NH_2002_1m_interp|2002
+      NH_2003_1m_interp|2003
+      NH_2006_1m_interp|2006" > interp.txt
+
+t.register input=NagsHead_99_08 file=interp.txt unit=years
+</code>
+</pre>
+
+<p>
+Check what you have now in <tt>NagsHead_99_08</tt> dataset.
+Set the same color table for all maps (copy the color table from map <tt>NH_1999_1m</tt>).
+
+<pre>
+<code class="neutral">
+t.rast.list input=NagsHead_99_08
+t.rast.colors input=NagsHead_99_08 raster=NH_1999_1m
+</code>
+</pre>
+
+<p>
+Display animation of space-time raster data set <tt>NagsHead_99_08</tt>,
+first just in 2D. Use the same steps as <a href="./pictures/anim1.png">here</a>,
+but use <tt>NagsHead_99_08</tt> dataset.
+
+<pre>
+<code class="gui">
+In main menu find Temporal > GUI tools > Animation tool.
+</code>
+<code class="neutral">
+g.gui.animation strds=NagsHead_99_08
+</code>
+</pre>
+
+<!--
+maps = grass.read_command('t.rast.list', input='NagsHead_99_08', method='comma').strip().split(',')
+for map in maps:
+    name, mapset = map.split('@')
+    grass.run_command('r.contour', flags='t', input=name, output=name + '_contour', step=2, cut=50)
+-->
+<p>
+After displaying 2D animation, we will display 2D and 3D animation side by side. Note that 3D in Animation tool (as well as m.nviz.image command bellow)
+is currently not supported on MS Windows.
+<ol>
+<li>To display animation in 3D,
+we first have to prepare and store 3D view parameters. To do that, launch GUI if not already launched,
+add e.g. NH_1999_1m, go to 3D view, set view as desired and fine resolution set to 1
+(see <a href="http://grass.osgeo.org/grass70/manuals/wxGUI.nviz.html#3d-view-layer-manager-toolbox">GUI manual</a>). </li>
+<li>Save workspace file (in menu File -> Workspace -> Save).</li>
+
+<li>In Animation tool, add another animation, choose 3D mode, set workspace file,
+and leave there <tt>elevation_map</tt> as the parameter to animate.<br>
+
+<img src="./pictures/anim_3d_dialog.png" alt="animation dialog" style="width: 200px;"/>
+</li>
+<li> The result can look like this, click on picture to show animation:<br>
+<!-- got black box for 3D animation on 10.6, try it on Mac 10.8. -->
+<a target="_blank" href="./pictures/NagsHead_animation.gif" >
+<img src="./pictures/anim4_result.png" alt="NagsHead series 2D and 3D animation" style="width: 600px;"/></a></li>
+</ol>
+<p>
+Sidenote: for scripting or working in command line, you can save your 3D settings
+as m.nviz.image command using the button on GIS Layer manager (second row) called 'Generate command for m.nviz.image'.
+Here is an example of a saved command:
+
+<!-- TODO: implement saving as python -->
+<pre>
+<code>
+m.nviz.image elevation_map=NH_1999_1m -a mode=fine resolution_fine=1 color_map=NH_1999_1m position=0.94,0.87 height=789 perspective=15 twist=0 zexag=2.000000 focus=487,469,8 light_position=0.68,-0.68,0.80 light_brightness=80 light_ambient=20 light_color=255:255:255 output=nviz_output format=ppm size=718,699
+</code>
+</pre>
+
+<h3>Space-time cube representation</h3>
+<p>
+Space-time cube is 3-dimensional representation where z-coordinate is time.
+We use 3D raster to represent space-time cube with z-coordinates as values of the 3D raster to explore the evolution of terrain in time [3, 4, 5].
+<p>
+To create space-time cube we vertically stack the series of digital elevation models using t.rast.to.rast3:
+
+<pre>
+<code class="neutral">
+t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08
+r3.info -g map=NagsHead_99_08
+g.region raster_3d=NagsHead_99_08 -p3
+</code>
+<code class="bash">
+# convert strds to 3D raster
+t.rast.to.rast3 input=NagsHead_99_08 output=NagsHead_99_08
+# check 3D extent and min and max values
+r3.info -g map=NagsHead_99_08
+# set region to this 3D raster for further processing
+g.region raster_3d=NagsHead_99_08 -p3
+</code>
+</pre>
+
+<!-- TODO: see how this is in 70 branch, display legend -->
+<p>
+Now, create a new 3D raster which will be used for coloring isosurfaces by years.
+Using t.rast.mapcalc we create a series of single-value raster maps for each year
+and then we stack them into a 3D raster and set a suitable color table.
+
+<pre>
+<code>
+t.rast.mapcalc inputs=NagsHead_99_08 expression="start_time() + 1999" output=NagsHead_years basename=NagsHead_years nprocs=4
+t.rast.to.rast3 input=NagsHead_years output=NagsHead_years
+</code>
+</pre>
+
+Now set the color tables of the space-time cube 3D raster and the second 3D raster.
+
+<pre>
+<code>
+r3.colors map=NagsHead_99_08 color=elevation
+r3.colors map=NagsHead_years color=bcyr
+</code>
+</pre>
+
+<p>
+Now we will display the space-time cube in 3D. Follow the instructions below:
+<ol>
+<li>Remove all maps in Layer Manager.</li>
+<li>Add 2008 digital elevation model (<tt>NH_2008_1m_0.05</tt>) which was divided by 20 for visualization purpose in 3D view because we have to use big exaggeration for the 3D raster (Add raster map layer -> select <tt>NH_2008_1m_0.05</tt>)</li>
+<li>Add <tt>NagsHead_99_08</tt> 3D raster from toolbar (Add various raster map layers -> Add 3D raster map layer -> select <tt>NagsHead_99_08</tt>).</li>
+<li>Right click on 3D raster -> Zoom to selected map.</li>
+<li>Paste d.legend command into GUI Command console:
+<pre><code class="neutral">d.legend -f rast3d=NagsHead_years at=5,50,7,10 use=1999,2000,2001,2002,2003,2004,2005,2006,2007,2008</code></pre>
+</li>
+<li>Set lower resolution to speed up 3D rendering:
+<pre><code>g.region -p3 res3=3 tbres=1</code></pre></li>
+<li>Switch to 3D view (be patient).</li>
+<li>On View page, set z-exaggeration to 20 and view height to 100.</li>
+<li>On Data page -> Surface, lower fine mode resolution to 1.</li>
+<li>On Data page -> Volume, add isosurface and then change its value to 11 or similar and change the color to use NagsHead_years.</li>
+<li>Set the isosurface resolution to 1.</li>
+<li>You can toggle normal direction of isosurface or change light on Appearance page -> Light to get better result.</li>
+</ol>
+
+<p>
+<img src="./pictures/nags_head_nviz.png" alt="NagsHead space-time cube in wxNviz" style="width: 700px;"/>
+
+<h2>Visualization of solar radiation</h2>
+
+<!-- TODO: here we have addons but they are linked,
+moreover we have no way to say don't link -->
+<p>
+Start GRASS with location NC_spm_temporal_workshop and mapset centennial.
+
+<p>
+We will compute solar radiation during a day for a part of North Carolina State University Centennial Campus.
+Then we will visualize the change of solar radiation as a 3D animation.
+If you don't have r.sun.hourly, download it:
+
+<pre><code class="neutral">
+g.extension extension=r.sun.hourly
+</code></pre>
+
+<p>
+Convert the today's date (or any other date) to day of year by running this command in Python shell tab in GUI.
+
+<pre>
+<code class="python">
+from datetime import datetime
+datetime.now().timetuple().tm_yday
+# or for an arbitrary day:
+datetime.datetime(2014, 6, 21).timetuple().tm_yday
+</code>
+</pre>
+
+<p>
+Use this number for option <code>day</code>.
+Compute beam irradiance raster series (be patient) with the following command.
+The time series is automatically registered into a space-time raster dataset.
+
+<pre>
+<code>
+r.sun.hourly -t elevation=elev_lid_small start_time=6 end_time=20 day=200 year=2014 beam_rad_basename=beam nprocs=4
+</code>
+</pre>
+Set custom color table for just created dataset <code>beam</code>:
+<pre>
+<code class="gui">
+Use interactive input box in t.rast.colors dialog
+or add the following line with coordinates to a newly created rules.txt file:
+0% 60:60:60
+70% yellow
+100% 255:70:0
+
+t.rast.colors input=beam rules=rules.txt
+</code>
+<code class="bash">
+echo "0% 60:60:60
+      70% yellow
+      100% 255:70:0" > rules.txt
+t.rast.colors input=beam rules=rules.txt
+</code>
+</pre>
+
+<p>
+Finally, we animate the series in 3D. To do that, we first add <code>elev_lid_small</code> map in GUI,
+zoom to it, and swith to 3D view.
+We set desired view and resolution and then change the color by draping
+over one of the solar radiation maps (see <a href="http://grass.osgeo.org/grass70/manuals/wxGUI.nviz.html#3d-view-layer-manager-toolbox">GUI manual</a>).
+We save workspace to a file.
+Then we launch animation tool and add new animation. Choose 3D, add the computed space-time raster dataset,
+set saved workspace file and choose color_map option to animate.
+Note that 3D animation are not supported on MS Windows.
+<p>
+<img src="./pictures/anim3_result.png" alt="solar radiation animation in 3D"/>
+
+<h2>References</h2>
+[1] Gebbert, S., Pebesma, E. (2014). <em>A temporal GIS for field based environmental modeling</em>. Environmental Modelling & Software, 53, 1–12.<br>
+
+[2] State Climate Office of North Carolina,
+<a href="http://convection.meas.ncsu.edu:8080/thredds/catalog/catalog.html">http://convection.meas.ncsu.edu:8080/thredds/catalog/catalog.html</a><br>
+[3] Mitasova, H., Harmon, R. S., Weaver, K. J., Lyons, N. J., Overton, M. F. (2012). <em><a href="http://geospatial.ncsu.edu/osgeorel/publications/Geomorph_Visu2011.pdf">Scientific visualization of landscapes and landforms</a></em>. Geomorphology, 137(1), 122–137.<br>
+[4] Mitasova, H., Hardin, E., Starek, M. J., Harmon, R. S., Overton, M. F. (2011). <em><a href="http://geospatial.ncsu.edu/osgeorel/publications/Mitasova2011geomorphometry.pdf">Landscape dynamics from LiDAR data time series</a></em>. Geomorphometry, 3–6.<br>
+[5] Starek, M.J., Mitasova H., Hardin, E., Overton, M.F., Harmon, R.S. (2011). <em>Modeling and analysis of landscape evolution using airborne, terrestrial, and laboratory laser scanning.</em> Geosphere, 7(6), p. 1340–1356.
+
+<hr>
+
+<p><i>Last changed: 2014-09-09 15:27</i>
+<p>
+  <a href="http://grass.osgeo.org/grass71/manuals/">GRASS GIS manual main index</a> |
+  <a href="http://grass.osgeo.org/grass71/manuals/temporal.html">Temporal modules index</a> |
+  <a href="http://grass.osgeo.org/grass71/manuals/topics.html">Topics index</a> |
+  <a href="http://grass.osgeo.org/grass71/manuals/keywords.html">Keywords Index</a> |
+  <a href="http://grass.osgeo.org/grass71/manuals/full_index.html">Full index</a>
+</p>
+<p>
+  <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+    <img alt="Creative Commons License" src="ccbysa.png"></a>
+  <br>
+  Spatio-temporal data handling and visualization in GRASS GIS workshop for FOSS4G 2014
+  by Vaclav Petras, Anna Petrasova, Helena Mitasova and Markus Neteler
+  is licensed under&nbsp;a&nbsp;<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+
+
+</p>
+  <script src="codetabs.js"></script>
+
+</div>
+
+</body>
+</html>

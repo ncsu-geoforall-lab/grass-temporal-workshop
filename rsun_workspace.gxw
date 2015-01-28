@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxw SYSTEM "grass-gxw.dtd">
+<gxw>
+    <layer_manager dim="49,24,525,712">
+    </layer_manager>
+    <display name="Display 1" render="1" mode="0" showCompExtent="0" alignExtent="1" constrainRes="0" dim="564,24,785,680" extent="638926.707925,224024.420762,639608.577811,224679.783642,0.000000,1.000000" tbres="1.000000" viewMode="3d" >
+        <layer type="raster" name="elev_lid_small@centennial" checked="1" opacity="1.000000">
+            <selected />
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>elev_lid_small@centennial</value>
+                </parameter>
+            </task>
+            <nviz>
+                <surface>
+                    <attribute name="shine" map="0">
+                        <value>60.0</value>
+                    </attribute>
+                    <attribute name="color" map="1">
+                        <value>beam_14.00@centennial</value>
+                    </attribute>
+                    <draw shading="gouraud" style="surface" mode="fine">
+                        <resolution type="coarse">
+                            <value>9</value>
+                        </resolution>
+                        <resolution type="fine">
+                            <value>1</value>
+                        </resolution>
+                        <wire_color>
+                            <value>136:136:136</value>
+                        </wire_color>
+                    </draw>
+                    <position>
+                        <x>0</x>
+                        <y>0</y>
+                        <z>0</z>
+                    </position>
+                </surface>
+            </nviz>
+        </layer>
+        <layer type="raster" name="beam_09.00@centennial" checked="0" opacity="1.000000">
+            <task name="d.rast">
+                <parameter name="map">
+                    <value>beam_09.00@centennial</value>
+                </parameter>
+            </task>
+        </layer>
+        <nviz_state>
+            <view>
+                <v_position>
+                    <x>0.73</x>
+                    <y>0.93</y>
+                </v_position>
+                <persp>
+                    <value>16</value>
+                    <step>2</step>
+                    <min>1</min>
+                    <max>100</max>
+                </persp>
+                <v_height>
+                    <value>1706</value>
+                    <min>-1271</min>
+                    <max>2137</max>
+                </v_height>
+                <twist>
+                    <value>0</value>
+                    <min>-180</min>
+                    <max>180</max>
+                </twist>
+                <z-exag>
+                    <value>1.00</value>
+                    <min>0</min>
+                    <max>10</max>
+                    <llRatio>1.00</llRatio>
+                </z-exag>
+                <focus>
+                    <x>346</x>
+                    <y>313</y>
+                    <z>110</z>
+                </focus>
+                <background_color>
+                    <value>255:255:255</value>
+                </background_color>
+            </view>
+            <light>
+                <l_position>
+                    <x>0.68</x>
+                    <y>-0.68</y>
+                    <z>80</z>
+                </l_position>
+                <bright>
+                    <value>80</value>
+                </bright>
+                <ambient>
+                    <value>20</value>
+                </ambient>
+                <color>
+                    <value>255:255:255</value>
+                </color>
+            </light>
+        </nviz_state>
+    </display>
+</gxw>

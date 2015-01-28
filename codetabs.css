@@ -1,0 +1,161 @@
+/*
+Copyright (c) 2014, Vaclav Petras, NCSU OSGeoREL
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+* are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+.tabs-menu {
+    height: 25px;
+    /*clear: both;*/
+    margin-bottom: 2px;
+    margin-top: 1em;
+    padding: 0px;
+    font-size: 70%;
+}
+
+.tabs-menu ul {
+    padding: 0px;
+    margin: 0px;
+}
+
+/*
+.tabs-menu:after {
+    clear: both;
+}
+*/
+
+.tabs-menu li {
+    list-style-type: none;
+    height: 15px;
+    /*line-height: 15px;*/
+    float: left;
+    /*margin-right: 10px;*/
+    background-color: white;
+    border-top: 1px solid #d4d4d1;
+    border-right: 1px solid #d4d4d1;
+    border-left: 1px solid #d4d4d1;
+    border-bottom: 1px solid #d4d4d1;
+    padding: 0px;
+    margin: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    /* here we are making space for a to have large padding */
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.tabs-menu li.current {
+    position: relative;
+    background-color: #F0F0F0;
+    border-bottom: 1px solid #F0F0F0;
+    /*z-index: 5;*/
+}
+
+.tabs-menu li a {
+    /* a lot of padding to spread across the whole tab */
+    padding-bottom: 5px;
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 0px;
+    color: grey;
+    text-decoration: none;
+    line-height: 15px;
+}
+
+.tabs-menu .current a {
+    color: grey;
+}
+
+.tab {
+    background-color: #fff;
+    float: left;
+    padding: 0px;
+    margin: 0px;
+    margin-bottom: 2em;
+    width: auto;
+}
+
+.tab-content {
+    /*width: 660px;*/
+    padding: 0px;
+    margin: 0px;
+    display: none;
+}
+
+.tabs-container {
+    /*clear: both;*/
+    /*display: block;*/
+}
+
+.tabs-container:after {
+    display: block;
+    clear: both;
+    content: "";
+    width: 0px;
+}
+
+pre code {
+    overflow-x: auto;
+}
+
+.tabs-container pre {
+    margin-top: 0px;
+}
+
+.visible {
+    padding: 0.5em;
+}
+
+pre code a.modulelink {
+    color: inherit;
+    text-decoration: none;
+}
+
+pre code a.modulelink:hover {
+    text-decoration: underline;
+}
+
+p a.modulelink {
+    text-decoration: none;
+}
+
+p a.modulelink:hover {
+    text-decoration: underline;
+}
+
+pre samp {
+    overflow-x: auto;
+    display: block; /* for overflow-x to work */
+}
+
+/* class to override pre style
+   pre tag required for tabs system
+   Using this for all code.gui not allow to do quick GUI pre-formatted guides
+   which we want as default.
+*/
+.text {
+    white-space: normal;
+    font-family: arial,sans-serif;
+    font-size: initial;
+}
