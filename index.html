@@ -389,9 +389,14 @@ t.rast.list input=precip_sum_2010 columns=start_time,max order=max sep=tab
 <p>
 Here we compute univariate statistics using t.rast.univar with temporal 'where' option
 to limit output to last 3 months of the year 2010.
+<!--
+Start time with greater than behaves not entirely as expected but
+according to #2270 it is a database backend problem/feature not GRASS
+https://trac.osgeo.org/grass/ticket/2270
+-->
 <pre>
 <code class="neutral">
-t.rast.univar input=tempmean_2010 where="start_time &gt; '2010-10-01'"
+t.rast.univar input=tempmean_2010 where="start_time &gt; '2010-09-30'"
 </code>
 </pre>
 <pre>
