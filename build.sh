@@ -1,4 +1,4 @@
-OUTDIR="../grass-temporal-workshop-pages"
+OUTDIR="build"
 
 set -e
 
