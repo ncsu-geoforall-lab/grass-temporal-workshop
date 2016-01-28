@@ -48,9 +48,10 @@ NEUTRAL_LANG_SELECTOR = '.' + 'neutral'
 NEUTRAL_LANG_LABEL = 'Standard'
 
 // including . to support also no prefix
-// for import grass.script as gscript use "gscript"
-// for from grass.script import run_command use ""
-GRASS_SCRIPT_PREFIX = "grass."
+// for import grass.script as gscript, use "gscript"
+// for from grass.script import run_command, use ""
+// for import grass.script as grass, use "grass"
+GRASS_SCRIPT_PREFIX = "gscript."
 
 // full name of the function to call grass command (without "(")
 //GRASS_RUN_COMMAND = GRASS_SCRIPT_PREFIX + "run_command"

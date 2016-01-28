@@ -175,8 +175,8 @@ List temperature raster maps with g.list:
 
     g.list type=raster pattern="*tempmean" --quiet
 
-Then launch t.register and copy and paste output of g.list to file parameter of t.register
-(input field under 'or enter values interactively'). In t.register dialog, set additional values:
+Then launch t.register and copy and paste output of g.list to <em>file</em> parameter of t.register
+(input field under 'or enter values directly'). In t.register dialog, set additional values:
 
 tab Input > input > <strong>tempmean</strong>
 tab Time Date > start > <strong>2000-01-01</strong>
@@ -294,7 +294,8 @@ g.gui.timeline inputs=tempmean,precip_sum,tempmean_2010,precip_sum_2010
 <img src="./pictures/timeline_extracted.png" alt="extracted datasets"/>
 
 <p>
-Create an animation of precipitation in 2010 (as in the picture) by following these steps:
+Create an animation of precipitation in 2010 (as in the picture below)
+by following the steps following the picture:
 <p>
 <img src="./pictures/anim1_result1.png" style="width: 400px;" alt="Result from Animation Tool (one animation)"/>
 <ul>
@@ -388,9 +389,14 @@ t.rast.list input=precip_sum_2010 columns=start_time,max order=max sep=tab
 <p>
 Here we compute univariate statistics using t.rast.univar with temporal 'where' option
 to limit output to last 3 months of the year 2010.
+<!--
+Start time with greater than behaves not entirely as expected but
+according to #2270 it is a database backend problem/feature not GRASS
+https://trac.osgeo.org/grass/ticket/2270
+-->
 <pre>
 <code class="neutral">
-t.rast.univar input=tempmean_2010 where="start_time &gt; '2010-10-01'"
+t.rast.univar input=tempmean_2010 where="start_time &gt; '2010-09-30'"
 </code>
 </pre>
 <pre>
