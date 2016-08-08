@@ -35,7 +35,7 @@ systems.
 Online version
 --------------
 
-* http://ncsu-osgeorel.github.io/grass-temporal-workshop/
+* http://ncsu-geoforall-lab.github.io/grass-temporal-workshop/
 
 
 Additional files
