@@ -416,7 +416,7 @@ Module t.remove enables to remove the actual data, too,
 using appropriate flags, but we will not do that now, since we still need the data.
 <pre>
 <code class="neutral">
-t.remove inputs=tempmean_2010,precip_sum_2010
+t.remove -f inputs=tempmean_2010,precip_sum_2010
 t.list type=strds
 g.list type=raster pattern="2010*tempmean"
 </code>
@@ -634,7 +634,7 @@ plt.show()
 
 <h2>Terrain time series visualization</h2>
 
-Start grass7 with location NC_spm_temporal_workshop and mapset NaghHead_series.
+Start grass7 with location NC_spm_temporal_workshop and mapset NagsHead_series.
 
 <h3>Time series registration and visualization</h3>
 
@@ -920,7 +920,7 @@ t.rast.colors input=beam rules=rules.txt
 
 <p>
 Finally, we animate the series in 3D. To do that, we first add <code>elev_lid_small</code> map in GUI,
-zoom to it, and swith to 3D view.
+zoom to it, and switch to 3D view.
 We set desired view and resolution and then change the color by draping
 over one of the solar radiation maps (see <a href="http://grass.osgeo.org/grass70/manuals/wxGUI.nviz.html#3d-view-layer-manager-toolbox">GUI manual</a>).
 We save workspace to a file.
