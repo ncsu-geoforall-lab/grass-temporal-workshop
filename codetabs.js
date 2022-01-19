@@ -92,21 +92,21 @@ function getMatches(string, regex, index) {
 function parse_code(code, lang) {
 
     var lines = code.split('\n');
-    
+
     // in theory, can contain also empty lines and comments
     parsed_lines = [];
-    
+
     for(var i = 0; i < lines.length; i++) {
-        
+
         try {
             line = lines[i]
             line = line.trim()
-            
+
             if (!line) {
                 continue;
             }
             //console.log(line)
-            
+
             var command = {
                 module: null,
                 flags: '',  // as string, e.g. abcd
@@ -115,6 +115,7 @@ function parse_code(code, lang) {
             }
             
             module_re = / *[a-z][3]?\.[a-z3][a-z3\.]*[a-z3]/ // / *([a-z][3]?\.[a-z][a-z.]?) /
+
             module = module_re.exec(line)
             if (!module)
                 // probably comment or something else
@@ -146,14 +147,14 @@ function parse_code(code, lang) {
                 }
                 value = match[1];
                 //console.log('option ' + option + ': ' + value)
-                
+
                 var key_value_option = {
                     key: option,
                     value: value,
                     quote: quotes_char
                 }
                 command.options.push(key_value_option)
-                
+
                 // safer for the rest would be removing of match from string
             }
 
@@ -176,7 +177,7 @@ function parse_code(code, lang) {
                 //console.log('command.flags: ' + command.flags)
                 //console.log('command.flags: ' + command.flags)
             }
-            
+
             if ((command.module == 'r.mapcalc' || command.module == 'r3.mapcalc' ) && !command.options.length) {
                 var flag_re = /"(.+ = .+)"/
                 var matches = flag_re.exec(line)
@@ -187,9 +188,9 @@ function parse_code(code, lang) {
                 }
                 command.options.push(key_value_option)
             }
-            
+
             parsed_lines.push(command);
-            
+
         } catch (err) {
             var text = "There was an error on this page.\n\n";
             text += "Error description: " + err.message + "\n\n";
@@ -207,7 +208,7 @@ function parse_code(code, lang) {
             }
             alert(text);
         }
-        
+
     }
     return parsed_lines;
 }
@@ -396,7 +397,6 @@ $(document).ready(function() {
         element.css('display', 'block');
         element.addClass("visible");
     });
-    
 
     // using has to really get only those created above
     $('.tabs-container').has('pre').each(function() {
@@ -409,7 +409,7 @@ $(document).ready(function() {
         $(this).children('samp').each(function() {
             $(this).text($(this).text().trim());
         });
-        
+
     });
 
     $('pre code').each(function() {
@@ -418,29 +418,29 @@ $(document).ready(function() {
         var description = ''
         if (tabcontent.hasClass('python')) {
             lang = 'python'
-            description = '<img src="python.png" style="height: 1em; width: 1em; margin-right: 0.2em;">Python'
+            description = '<img src="python.png" style="height: 1em; width: 1em; margin-right: 0.2em;" class="switchimg">Python'
         }
         else if (tabcontent.hasClass('bash')) {
             lang = 'bash'
-            description = '<img src="bash.png" style="height: 1em; width: 1em; margin-right: 0.2em;">Bash'
+            description = '<img src="bash.png" style="height: 1em; width: 1em; margin-right: 0.2em;" class="switchimg">Bash'
         }
         else if (tabcontent.hasClass('gui')) {
             lang = 'gui'
-            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;">GUI'
+            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;" class="switchimg">GUI'
         }
         else if (tabcontent.hasClass(NEUTRAL_LANG)) {
             lang = NEUTRAL_LANG
-            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;">' + NEUTRAL_LANG_LABEL
+            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;" class="switchimg">' + NEUTRAL_LANG_LABEL
         }
         else {
             lang = NEUTRAL_LANG
-            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;">' + NEUTRAL_LANG_LABEL
+            description = '<img src="grass.png" style="height: 1em; width: 1em; margin-right: 0.2em;" class="switchimg">' + NEUTRAL_LANG_LABEL
         }
 
         var parentid = tabcontent.parent().attr('id');
         var tabid = parentid + '-' + lang;
         tabcontent.attr('id', tabid);
-        
+
         ul = tabcontent.parent().parent().children('ul')
         var menuitem = '<li';
         //if (lang == NEUTRAL_LANG) {
@@ -453,9 +453,9 @@ $(document).ready(function() {
             //menuitem.addClass('current');
             menuitem += ' class="current"';
         }
-        
+
         menuitem += '><a href="#' + tabid + '">' + description + '</a></li>';
-        
+
         ul.append(menuitem)
         
         if (tabcontent.hasClass('generate')) {

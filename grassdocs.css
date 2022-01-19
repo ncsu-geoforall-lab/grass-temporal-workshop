@@ -41,6 +41,14 @@ hr.header {
     width: 100%;
 }
 
+p {
+  text-align: justify;
+}
+
+.justify {
+  text-align: justify;
+}
+
 h1{
     background-color: transparent;
     color: rgb(25%, 60%, 25%);
@@ -56,6 +64,10 @@ h2{
     font-family: arial,sans-serif;
     font-weight: bold;
     font-size: x-large;
+    padding-top: 0.8em;
+    padding-bottom: 0.1em;
+    margin: 0px;
+    -webkit-margin-after: 0.1em;
 }
 
 h3{
@@ -64,6 +76,10 @@ h3{
     font-family: arial,sans-serif;
     font-weight: bold;
     font-size: large;
+    padding-top: 0.8em;
+    padding-bottom: 0em;
+    margin: 0px;
+    -webkit-margin-after: 0.1em;
 }
 
 h4{

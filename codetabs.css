@@ -147,6 +147,7 @@ p a.modulelink:hover {
 pre samp {
     overflow-x: auto;
     display: block; /* for overflow-x to work */
+    line-height: 100%!important; /*to have original line height after changing it in grassdocs.css */
 }
 
 /* class to override pre style
@@ -158,4 +159,8 @@ pre samp {
     white-space: normal;
     font-family: arial,sans-serif;
     font-size: initial;
+}
+
+img.switchimg {
+    padding: 0px!important;
 }
